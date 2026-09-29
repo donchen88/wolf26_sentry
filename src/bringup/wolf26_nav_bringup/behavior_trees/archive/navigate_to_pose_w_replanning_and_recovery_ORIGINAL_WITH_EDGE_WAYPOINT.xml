@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Navigate to Pose with Edge Waypoint Fallback (ORIGINAL VERSION)
+
+  This behavior tree extends the standard Nav2 replanning tree with a key enhancement:
+  If the goal is outside the global costmap bounds, ComputePathToPoseWithEdgeWaypoint
+  automatically replaces it with the nearest reachable point on the costmap edge.
+  The robot then navigates to that intermediate point, at which point the goal is
+  still outside the map, so it will pick a new edge point closer to the original goal.
+  This process repeats until the robot reaches the original goal.
+
+  NOTE: Custom BT node ComputePathToPoseWithEdgeWaypoint is registered via plugin_lib_names
+  in nav2_params.yaml (pb_bt_nodes library). Port definitions are provided by the node's
+  providedPorts() method.
+-->
+<root BTCPP_format="4"
+      main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode name="NavigateRecovery"
+                  number_of_retries="10">
+      <!-- <PipelineSequence name="NavigateWithReplanning">
+        <RateController hz="3.0">
+          <RecoveryNode name="ComputePathToPose"
+                        number_of_retries="1">
+            <ComputePathToPoseWithEdgeWaypoint goal="{goal}"
+                                            path="{path}"
+                                            planner_id="GridBased"
+                                            global_costmap_service="global_costmap/get_costmap"
+                                            edge_search_resolution="0.1"
+                                            edge_max_search_dist="10.0"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Context"
+                                service_name="global_costmap/clear_entirely_global_costmap"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode name="FollowPath"
+                      number_of_retries="10">
+          <FollowPath path="{path}"
+                      controller_id="FollowPath"/>
+          <ClearEntireCostmap name="ClearLocalCostmap-Context"
+                              service_name="local_costmap/clear_entirely_local_costmap"/>
+        </RecoveryNode>
+      </PipelineSequence> -->
+      <ReactiveFallback name="NavigateUntilGoalReached">
+        <GoalReached goal="{goal}"
+                     global_frame="map"
+                     robot_base_frame="gimbal_yaw_fake"/>
+        <KeepRunningUntilFailure>
+          <PipelineSequence name="NavigateWithReplanning">
+            <RateController hz="5.0">
+              <RecoveryNode name="ComputePathToPose"
+                            number_of_retries="1">
+                <ComputePathToPoseWithEdgeWaypoint goal="{goal}"
+                                                path="{path}"
+                                                planner_id="GridBased"
+                                                global_costmap_service="global_costmap/get_costmap"
+                                                edge_search_resolution="0.1"
+                                                edge_max_search_dist="10.0"/>
+                <ClearEntireCostmap name="ClearGlobalCostmap-Context"
+                                    service_name="global_costmap/clear_entirely_global_costmap"/>
+              </RecoveryNode>
+            </RateController>
+            <RecoveryNode name="FollowPath"
+                          number_of_retries="10">
+              <FollowPath path="{path}"
+                          controller_id="FollowPath"/>
+              <ClearEntireCostmap name="ClearLocalCostmap-Context"
+                                  service_name="local_costmap/clear_entirely_local_costmap"/>
+            </RecoveryNode>
+          </PipelineSequence>
+        </KeepRunningUntilFailure>
+      </ReactiveFallback>
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <RoundRobin name="RecoveryActions">
+          <Sequence name="ClearingActions">
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree"
+                                service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree"
+                                service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+          <BackUp backup_dist="0.5"
+                  backup_speed="0.2"/>
+        </RoundRobin>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

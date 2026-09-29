@@ -1,0 +1,7 @@
+image: menkou.pgm
+mode: trinary
+resolution: 0.03
+origin: [-27.4, -6.79, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25

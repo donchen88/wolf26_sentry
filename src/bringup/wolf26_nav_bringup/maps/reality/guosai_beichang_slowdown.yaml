@@ -1,0 +1,7 @@
+image: guosai_beichang_slowdown.pgm
+mode: scale
+resolution: 0.03
+origin: [-4.45, -5.12, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4"
+      main_tree_to_execute="red">
+  <BehaviorTree ID="blue">
+    <ReactiveSequence>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <Fallback>
+        <Sequence>
+          <Sequence>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="420"/>
+            <Inverter>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="120"
+                          heat_threshold="0"
+                          barrel_heat_limit_threshold="500"/>
+            </Inverter>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <SendGoal goal_pose="1.13716; 0.621701; 0; 0;0;0;1"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+          </SequenceWithMemory>
+          <PubSuperCapacitor topic_name="super_capacitor"
+                             super_capacitor_state="0"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="0"
+                      higher_remain_time="420"/>
+          <SequenceWithMemory>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <ForceSuccess>
+              <Timeout msec="10000">
+                <SendGoal goal_pose="-3.75926; 4.23893; 0; 0;0;0;1"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+              </Timeout>
+            </ForceSuccess>
+          </SequenceWithMemory>
+          <PubSuperCapacitor topic_name="super_capacitor"
+                             super_capacitor_state="0"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="1"/>
+        </Sequence>
+      </Fallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="red">
+    <ReactiveSequence>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <RunOnce then_skip="true">
+        <SequenceWithMemory>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="1"/>
+          <SendGoal goal_pose="-8.92424; 4.56194; 0;0;0;0;1"
+                    action_name="/red_standard_robot1/navigate_to_pose"/>
+          <SendGoal goal_pose="1.13716; 0.621701; 0; 0;0;0;1"
+                    action_name="/red_standard_robot1/navigate_to_pose"/>
+        </SequenceWithMemory>
+      </RunOnce>
+      <Fallback>
+        <Sequence>
+          <Inverter>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="120"
+                        heat_threshold="0"
+                        barrel_heat_limit_threshold="500"/>
+          </Inverter>
+          <SequenceWithMemory>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <SendGoal goal_pose="1.13716; 0.621701; 0; 0;0;0;1"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+          </SequenceWithMemory>
+          <PubSuperCapacitor topic_name="super_capacitor"
+                             super_capacitor_state="0"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+        </Sequence>
+        <Sequence>
+          <IsStatusOK message="{robot_status}"
+                      hp_threshold="400"
+                      heat_threshold="200"
+                      barrel_heat_limit_threshold="500"/>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="0"
+                      higher_remain_time="300"/>
+          <SequenceWithMemory>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <SendGoal goal_pose="-2.79094; 1.49906; 0;0; 0; 0.0332614; 0.999447"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+          </SequenceWithMemory>
+          <PubSuperCapacitor topic_name="super_capacitor"
+                             super_capacitor_state="0"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="1"/>
+          <Repeat num_cycles="-1">
+            <ReactiveSequence>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="120"
+                          heat_threshold="0"
+                          barrel_heat_limit_threshold="500"/>
+              <Sequence>
+                <SendGoal goal_pose="-3.72369; 2.84982; 0;0; 0; -0.999075; 0.0430125"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+                <SendGoal goal_pose="-4.65581; 1.92999; 0; 0; 0; 0.998122; 0.0612526"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+                <SendGoal goal_pose="-5.05263; 3.07304; 0;0; 0; 0.995421; 0.0955895"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+              </Sequence>
+            </ReactiveSequence>
+          </Repeat>
+        </Sequence>
+      </Fallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="IsGameTime"
+            editable="true">
+      <input_port name="message"
+                  default="{game_status}"/>
+      <input_port name="game_progress"
+                  default="4"/>
+      <input_port name="lower_remain_time"
+                  default="0"/>
+      <input_port name="higher_remain_time"
+                  default="300"/>
+    </Action>
+    <Action ID="IsStatusOK"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_status}"/>
+      <input_port name="hp_threshold"
+                  default="100"/>
+      <input_port name="heat_threshold"
+                  default="350"/>
+      <input_port name="barrel_heat_limit_threshold"
+                  default="0"/>
+    </Action>
+    <Action ID="PubChassisMode"
+            editable="true">
+      <input_port name="topic_name"
+                  default="chassis_mode"/>
+      <input_port name="chassis_mode"
+                  default="0">0=正常底盘速度, 1=加速底盘旋转, 2=过起伏路段, 3=超电状态</input_port>
+    </Action>
+    <Action ID="PubSuperCapacitor"
+            editable="true">
+      <input_port name="topic_name"
+                  default="super_capacitor"/>
+      <input_port name="super_capacitor_state"
+                  default="0">0=关闭超电, 1=开启超电</input_port>
+    </Action>
+    <Action ID="SendGoal"
+            editable="true">
+      <input_port name="goal_pose"
+                  default="0;0;0; 0;0;0;1"/>
+      <input_port name="action_name"
+                  default="navigate_to_pose"/>
+    </Action>
+    <Action ID="SubGameStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="game_status"/>
+      <output_port name="game_status"
+                   default="{game_status}"/>
+    </Action>
+    <Action ID="SubRobotStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_status"/>
+      <output_port name="robot_status"
+                   default="{robot_status}"/>
+    </Action>
+  </TreeNodesModel>
+
+</root>

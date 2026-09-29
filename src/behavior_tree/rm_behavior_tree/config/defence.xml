@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="Untitled">
+    <ReactiveSequence>
+      <SubAllRobotHP topic_name="robot_hp"
+                     robot_hp="{robot_hp}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <WhileDoElse>
+        <IsGameTime message="{game_status}"
+                    game_progress="4"
+                    lower_remain_time="0"
+                    higher_remain_time="420"/>
+        <Repeat num_cycles="-1">
+          <ReactiveFallback>
+            <Sequence>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="100"
+                          heat_threshold="0"/>
+              <SendGoal goal_pose="8.1;-2.6;0; 0;0;0;1"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+              <Sequence>
+                <SendGoal goal_pose="6.5;-6.5;0; 0;0;0;1"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+                <SendGoal goal_pose="9.0;-7.7;0; 0;0;0;1"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+              </Sequence>
+            </Sequence>
+          </ReactiveFallback>
+        </Repeat>
+      </WhileDoElse>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="defence">
+    <ReactiveSequence>
+      <SubAllRobotHP topic_name="robot_hp"
+                     robot_hp="{robot_hp}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <Fallback>
+        <Sequence>
+          <IsOutpostOK all_robot_hp="{robot_hp}"
+                       hp_threshold="10"/>
+          <ReactiveSequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="100"
+                        heat_threshold="350"/>
+            <GetCurrentLocation current_location="{current_location}"/>
+            <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                      action_name="navigate_to_pose"/>
+            <Fallback>
+              <Sequence>
+                <IsDetectEnemy message="{armors}"/>
+                <RobotControl stop_gimbal_scan="True"
+                              chassis_spin_vel="False"/>
+              </Sequence>
+              <Sequence>
+                <IsDetectEnemy message="{armors}"/>
+                <Fallback>
+                  <Sequence>
+                    <IsStatusOK message="{robot_status}"
+                                hp_threshold="100"
+                                heat_threshold="350"/>
+                    <RobotControl stop_gimbal_scan="True"
+                                  chassis_spin_vel="False"/>
+                  </Sequence>
+                  <Sequence>
+                    <Inverter>
+                      <IsStatusOK message="{robot_status}"
+                                  hp_threshold="100"
+                                  heat_threshold="350"/>
+                    </Inverter>
+                    <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                              action_name="navigate_to_pose"/>
+                  </Sequence>
+                </Fallback>
+              </Sequence>
+            </Fallback>
+          </ReactiveSequence>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <IsOutpostOK all_robot_hp="{robot_hp}"
+                         hp_threshold="10"/>
+          </Inverter>
+          <WhileDoElse>
+            <AlwaysSuccess/>
+            <ReactiveSequence>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="100"
+                          heat_threshold="350"/>
+              <GetCurrentLocation current_location="{current_location}"/>
+              <MoveAround expected_nearby_goal_count="5"
+                          expected_dis="0.3"
+                          message="{current_location}"/>
+              <Fallback>
+                <Sequence>
+                  <IsDetectEnemy message="{armors}"/>
+                  <IsStatusOK message="{robot_status}"
+                              hp_threshold="100"
+                              heat_threshold="350"/>
+                  <RobotControl stop_gimbal_scan="True"
+                                chassis_spin_vel="False"/>
+                </Sequence>
+                <Sequence>
+                  <Inverter>
+                    <IsStatusOK message="{robot_status}"
+                                hp_threshold="100"
+                                heat_threshold="350"/>
+                  </Inverter>
+                  <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                            action_name="navigate_to_pose"/>
+                </Sequence>
+              </Fallback>
+            </ReactiveSequence>
+          </WhileDoElse>
+        </Sequence>
+      </Fallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="GetCurrentLocation"
+            editable="true">
+      <output_port name="current_location"
+                   default="{current_location}"/>
+    </Action>
+    <Action ID="IsDetectEnemy"
+            editable="true">
+      <input_port name="message"
+                  default="{armors}"/>
+    </Action>
+    <Action ID="IsGameTime"
+            editable="true">
+      <input_port name="message"
+                  default="{game_status}"/>
+      <input_port name="game_progress"
+                  default="4"/>
+      <input_port name="lower_remain_time"
+                  default="0"/>
+      <input_port name="higher_remain_time"
+                  default="300"/>
+    </Action>
+    <Action ID="IsOutpostOK"
+            editable="true">
+      <input_port name="all_robot_hp"
+                  default="{robot_hp}"/>
+      <input_port name="hp_threshold"
+                  default="10"/>
+    </Action>
+    <Action ID="IsStatusOK"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_status}"/>
+      <input_port name="hp_threshold"
+                  default="100"/>
+      <input_port name="heat_threshold"
+                  default="350"/>
+    </Action>
+    <Action ID="MoveAround"
+            editable="true">
+      <input_port name="expected_nearby_goal_count"
+                  default="5"/>
+      <input_port name="expected_dis"
+                  default="0.3"/>
+      <input_port name="message"
+                  default="{current_location}"/>
+    </Action>
+    <Action ID="RobotControl"
+            editable="true">
+      <input_port name="stop_gimbal_scan"
+                  default="True"/>
+      <input_port name="chassis_spin_vel"
+                  default="False"/>
+    </Action>
+    <Action ID="SendGoal"
+            editable="true">
+      <input_port name="goal_pose"
+                  default="0;0;0; 0;0;0;1"/>
+      <input_port name="action_name"
+                  default="navigate_to_pose"/>
+    </Action>
+    <Action ID="SubAllRobotHP"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_hp"/>
+      <output_port name="robot_hp"
+                   default="{robot_hp}"/>
+    </Action>
+    <Action ID="SubGameStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="game_status"/>
+      <output_port name="game_status"
+                   default="{game_status}"/>
+    </Action>
+    <Action ID="SubRobotStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_status"/>
+      <output_port name="robot_status"
+                   default="{robot_status}"/>
+    </Action>
+  </TreeNodesModel>
+
+</root>

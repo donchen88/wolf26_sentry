@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+  Custom BT Nodes for pb2025_sentry_nav
+  These nodes extend the nav2_behavior_tree node definitions.
+  Add this file to your BT XML trees via:
+    <root BTCPP_format="4">
+      <include path="$(find-pkg-share pb_nav2_plugins)/behavior_tree_nodes.xml"/>
+      ...
+    </root>
+-->
+<root>
+  <TreeNodesModel>
+    <!-- Custom compute path action with edge waypoint fallback -->
+    <Action ID="ComputePathToPoseWithEdgeWaypoint">
+      <input_port name="goal">Destination to plan to</input_port>
+      <input_port name="start">Start pose of the path if overriding current robot pose</input_port>
+      <input_port name="planner_id">Mapped name to the planner plugin type to use</input_port>
+      <input_port name="server_name">Server name</input_port>
+      <input_port name="server_timeout">Server timeout</input_port>
+        <input_port name="input_goal_is_temporary">Input goal is temporary goal</input_port>
+        <input_port name="global_costmap_service">Service name for global costmap (default: global_costmap/get_costmap)</input_port>
+        <input_port name="search_radius">Maximum radius (m) around blocked goal to search (default: 1.0)</input_port>
+        <input_port name="search_resolution">Search resolution (m) when sampling candidates (default: 0.05)</input_port>
+        <input_port name="inflation_gradient_weight">Inflation-gradient penalty (default: 1.0)</input_port>
+        <input_port name="temporary_goal_reached_tolerance">Distance threshold to consider temporary target reached (default: 0.30)</input_port>
+        <input_port name="temporary_goal_stall_timeout">Max time in seconds to keep temporary goal before retrying original target (default: 1.5)</input_port>
+        <input_port name="temporary_goal_stall_progress_distance">Minimum distance improvement to treat temporary goal as progressing (default: 0.05)</input_port>
+        <input_port name="edge_search_resolution">Resolution (m) when searching for the nearest edge point (default: 0.1)</input_port>
+        <input_port name="edge_max_search_dist">Maximum distance (m) to search for an edge point (default: 5.0)</input_port>
+        <input_port name="edge_minimum_travel_distance">Minimum travel distance before treating edge waypoint as reached (default: 0.35)</input_port>
+      <output_port name="path">Path computed by the planner</output_port>
+      <output_port name="output_is_temporary_goal">Whether output_goal is temporary</output_port>
+      <output_port name="goal_source">Diagnostic tag of selected goal</output_port>
+    </Action>
+
+   
+  </TreeNodesModel>
+</root>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4" project_name="Project">
+    <include path="2026_rmuc.xml"/>
+    <include path="2026_rmuc_blue.xml"/>
+    <include path="guosai.xml"/>
+    <include path="guosai_blue.xml"/>
+    <include path="guosai_red.xml"/>
+    <include path="map_save.xml"/>
+    <include path="rmuc_2026_test.xml"/>
+    <include path="rmuc_save.xml"/>
+    <include path="test.xml"/>
+    <!-- Description of Node Models (used by Groot) -->
+    <TreeNodesModel>
+        <Control ID="DecisionSwitch" editable="true">
+            <input_port name="message" default="{decision_num}"/>
+        </Control>
+        <Condition ID="GetBlackboard" editable="true">
+            <input_port name="key"/>
+        </Condition>
+        <Action ID="GetCurrentLocation" editable="true">
+            <output_port name="current_location" default="{current_location}"/>
+            <input_port name="target_frame" default="map"/>
+            <input_port name="source_frame" default="chassis"/>
+        </Action>
+        <Action ID="IsAttacked" editable="true">
+            <input_port name="message" default="{robot_status}"/>
+            <input_port name="hp_threshold" default="10"/>
+            <input_port name="timeout_msec" default="10000"/>
+        </Action>
+        <Action ID="IsAttaked" editable="true">
+            <input_port name="message" default="{robot_status}"/>
+        </Action>
+        <Condition ID="IsAutoAimOK" editable="true">
+            <input_port name="message" default="{auto_aim_status}"/>
+            <input_port name="target_status" default="0">1正常，0有问题</input_port>
+        </Condition>
+        <Condition ID="IsBaseAttacked" editable="true">
+            <input_port name="all_robot_hp" default="{robot_hp}"/>
+            <input_port name="hp_threshold" default="10"/>
+            <input_port name="timeout_msec" default="10000"/>
+        </Condition>
+        <Condition ID="IsBaseStatusOK" editable="true">
+            <input_port name="robot_hp" default="{robot_hp}"/>
+            <input_port name="hp_threshold" default="0"/>
+        </Condition>
+        <Condition ID="IsChassisEnergyOK" editable="true">
+            <input_port name="message" default="{chassis_energy}"/>
+        </Condition>
+        <Action ID="IsDetectEnemy" editable="true">
+            <input_port name="message" default="{armors}"/>
+            <input_port name="max_range" default="-1.0"/>
+            <input_port name="current_location"/>
+        </Action>
+        <Action ID="IsEnemyOutpostOK" editable="true">
+            <input_port name="robot_hp" default="{robot_hp}"/>
+            <input_port name="hp_threshold" default="200"/>
+        </Action>
+        <Action ID="IsFriendOK" editable="true">
+            <input_port name="message" default="{robot_hp}"/>
+            <input_port name="friend_color" default="red"/>
+        </Action>
+        <Action ID="IsGameTime" editable="true">
+            <input_port name="message" default="{game_status}"/>
+            <input_port name="game_progress" default="4"/>
+            <input_port name="lower_remain_time" default="0"/>
+            <input_port name="higher_remain_time" default="300"/>
+        </Action>
+        <Condition ID="IsGimbalTargetInZone" editable="true">
+            <input_port name="target_x" default="{gimbal_target_x}">云台手目标点 x 坐标 (gimbal_frame)</input_port>
+            <input_port name="target_y" default="{gimbal_target_y}">云台手目标点 y 坐标 (gimbal_frame)</input_port>
+            <input_port name="x1"/>
+            <input_port name="y1"/>
+            <input_port name="x2"/>
+            <input_port name="y2"/>
+            <input_port name="x3"/>
+            <input_port name="y3"/>
+            <input_port name="x4"/>
+            <input_port name="y4"/>
+        </Condition>
+        <Condition ID="IsGimbalTargetValid" editable="true">
+            <input_port name="message" default="{gimbal_target_valid}">云台手目标点是否有效</input_port>
+            <input_port name="target_x" default="{gimbal_target_x}">云台目标点 x (gimbal_frame)</input_port>
+            <input_port name="target_y" default="{gimbal_target_y}">云台目标点 y (gimbal_frame)</input_port>
+            <input_port name="target_timeout_ms" default="5000">目标点超时时间(毫秒)，超时后返回 FAILURE</input_port>
+        </Condition>
+        <Action ID="IsOutpostOK" editable="true">
+            <input_port name="all_robot_hp" default="{robot_hp}"/>
+            <input_port name="hp_threshold" default="10"/>
+        </Action>
+        <Condition ID="IsRemoteStatus" editable="true">
+            <input_port name="message" default="{remote_status}"/>
+            <input_port name="target_status" default="1">当前遥控器模式：1=正常，2=保守，3=激进
+</input_port>
+        </Condition>
+        <Condition ID="IsRfidDetected" editable="true">
+            <input_port name="key_port" default="{@referee_rfidStatus}"/>
+            <input_port name="base_gain_point" default="false">己方基地增益点</input_port>
+            <input_port name="friendly_fortress_gain_point" default="false">己方堡垒增益点</input_port>
+            <input_port name="center_gain_point" default="true">中心增益点(RMUL)</input_port>
+        </Condition>
+        <Condition ID="IsRuneStatus" editable="true">
+            <input_port name="rune_status" default="{rune_status}"/>
+            <input_port name="target_count" default="1">要触发的 rune_count：1=开过一次小符，2=开过两次小符</input_port>
+        </Condition>
+        <Action ID="IsStatusOK" editable="true">
+            <input_port name="message" default="{robot_status}"/>
+            <input_port name="hp_threshold" default="100"/>
+            <input_port name="heat_threshold" default="350"/>
+            <input_port name="barrel_heat_limit_threshold" default="0"/>
+        </Action>
+        <Condition ID="IsTargetInZone" editable="true">
+            <input_port name="armors"/>
+            <input_port name="x1"/>
+            <input_port name="y1"/>
+            <input_port name="x2"/>
+            <input_port name="y2"/>
+            <input_port name="x3"/>
+            <input_port name="y3"/>
+            <input_port name="x4"/>
+            <input_port name="y4"/>
+        </Condition>
+        <Action ID="IsTimeToBullet" editable="true">
+            <input_port name="message" default="{game_status}"/>
+            <input_port name="game_progress" default="4"/>
+            <input_port name="time_to_bullet" default="60 120 180 240"/>
+        </Action>
+        <Action ID="MoveAround" editable="true">
+            <input_port name="expected_nearby_goal_count" default="5"/>
+            <input_port name="expected_dis" default="0.3"/>
+            <input_port name="message" default="{current_location}"/>
+            <input_port name="action_name" default="navigate_to_pose"/>
+        </Action>
+        <Decorator ID="Not" editable="true"/>
+        <Action ID="PrintMessage" editable="true">
+            <input_port name="message_to_print" default="Hello,World!"/>
+        </Action>
+        <Action ID="PubAutoAimMode" editable="true">
+            <input_port name="topic_name" default="auto_aim_mode"/>
+            <input_port name="auto_aim_mode" default="0">0 = 默认瞄敌人
+1 = 瞄小符
+2 = 瞄大符
+3 = 瞄前哨
+4 = 恢复底盘速度
+5 = 加速底盘旋转</input_port>
+        </Action>
+        <Action ID="PubAutoaimTarget" editable="true">
+            <input_port name="topic_name" default="autoaim_target"/>
+            <input_port name="target_ids"/>
+        </Action>
+        <Action ID="PubChassisMode" editable="true">
+            <input_port name="topic_name" default="chassis_mode"/>
+            <input_port name="chassis_mode" default="0">0=正常底盘速度, 1=加速底盘旋转, 2=过起伏路段, 3=超电状态</input_port>
+        </Action>
+        <Action ID="PubEnemyStatus" editable="true">
+            <input_port name="topic_name" default="enemy_status"/>
+            <input_port name="invincible_enemy_ids"/>
+        </Action>
+        <Action ID="PubRobotState" editable="true">
+            <input_port name="topic_name" default="robot_state"/>
+            <input_port name="robot_state" default="1">1=移动姿态，2=防御姿态，3=进攻姿态</input_port>
+        </Action>
+        <Action ID="PubSuperCapacitor" editable="true">
+            <input_port name="topic_name" default="super_capacitor"/>
+            <input_port name="super_capacitor_state" default="0">0=关闭超电, 1=开启超电</input_port>
+        </Action>
+        <Action ID="PursueEnemy" editable="true">
+            <input_port name="armors" default="{armors}"/>
+            <input_port name="current_location" default="{current_location}"/>
+            <input_port name="pursue_radius" default="1.5">攻击半径/m</input_port>
+            <input_port name="pursue_distance_threshold" default="0.5">敌人移动阈值/m，超过则发新追击点</input_port>
+            <input_port name="max_pursuit_points" default="10">最多发几个追击点</input_port>
+            <inout_port name="update_interval" default="0.5">更新频率/s</inout_port>
+            <input_port name="enemy_timeout" default="3.0">敌人数据超时/s，超过则返回SUCCESS</input_port>
+            <input_port name="action_name" default="/red_standard_robot1/navigate_to_pose"/>
+            <input_port name="target_frame" default="map">目标坐标系</input_port>
+            <input_port name="robot_base_frame" default="base_link">机器人基座坐标系</input_port>
+            <input_port name="map_topic" default="/map">地图话题，用于障碍物检测</input_port>
+            <input_port name="wall_check_clearance" default="0.0">障碍物检测安全间隔/m，0表示禁用</input_port>
+        </Action>
+        <Action ID="RMSetBlackboard" editable="true">
+            <input_port name="key">blackboard key (string)，写入的键名</input_port>
+            <input_port name="value" default="true">要写入的布尔值 (true/false)</input_port>
+        </Action>
+        <Decorator ID="RateController">
+            <input_port name="hz">Rate</input_port>
+        </Decorator>
+        <Action ID="RobotControl" editable="true">
+            <input_port name="stop_gimbal_scan" default="True"/>
+            <input_port name="chassis_spin_vel" default="False"/>
+        </Action>
+        <Action ID="SendGoal" editable="true">
+            <input_port name="goal_pose" default="0;0;0; 0;0;0;1"/>
+            <input_port name="action_name" default="navigate_to_pose"/>
+        </Action>
+        <Action ID="SubAllRobotHP" editable="true">
+            <input_port name="topic_name" default="robot_hp"/>
+            <output_port name="robot_hp" default="{robot_hp}"/>
+        </Action>
+        <Action ID="SubArmors" editable="true">
+            <input_port name="topic_name" default="/detector/armors"/>
+            <output_port name="armors" default="{armors}"/>
+        </Action>
+        <Action ID="SubAutoAimStatus" editable="true">
+            <input_port name="topic_name" default="auto_aim_status"/>
+            <input_port name="auto_aim_status" default="{auto_aim_status}"/>
+        </Action>
+        <Action ID="SubChassisEnergy" editable="true">
+            <input_port name="topic_name" default="chassis_energy"/>
+            <output_port name="chassis_energy" default="{chassis_energy}"/>
+        </Action>
+        <Action ID="SubDecisionNum" editable="true">
+            <input_port name="topic_name" default="decision_num"/>
+            <output_port name="decision_num" default="{decision_num}"/>
+        </Action>
+        <Action ID="SubGameStatus" editable="true">
+            <input_port name="topic_name" default="game_status"/>
+            <output_port name="game_status" default="{game_status}"/>
+        </Action>
+        <Action ID="SubGimbalTarget" editable="true">
+            <input_port name="topic_name" default="gimbal_target_point">云台手发送目标点的话题</input_port>
+            <input_port name="gimbal_frame" default="gimbal_field">云台坐标系名称（TF frame ID）</input_port>
+            <input_port name="gimbal_origin_x" default="0.0">gimbal_frame原点在map中的X坐标</input_port>
+            <input_port name="gimbal_origin_y" default="0.0">gimbal_frame原点在map中的Y坐标</input_port>
+            <input_port name="gimbal_origin_z" default="0.0">gimbal_frame原点在map中的Z坐标</input_port>
+            <input_port name="gimbal_yaw" default="0.0">gimbal_frame在map中的偏航角（弧度）</input_port>
+            <output_port name="target_pose" default="{gimbal_target_pose}">转换后的目标点 PoseStamped</output_port>
+            <output_port name="target_valid" default="{gimbal_target_valid}">是否有有效的云台手目标点</output_port>
+            <output_port name="target_x" default="{gimbal_target_x}">原始云台目标点 x (gimbal_frame)</output_port>
+            <output_port name="target_y" default="{gimbal_target_y}">原始云台目标点 y (gimbal_frame)</output_port>
+        </Action>
+        <Action ID="SubRemoteStatus" editable="true">
+            <input_port name="topic_name" default="remote_status"/>
+            <input_port name="remote_status" default="{remote_status}"/>
+        </Action>
+        <Action ID="SubRobotStatus" editable="true">
+            <input_port name="topic_name" default="robot_status"/>
+            <output_port name="robot_status" default="{robot_status}"/>
+        </Action>
+        <Action ID="SubRuneStatus" editable="true">
+            <input_port name="topic_name" default="rune_status"/>
+            <output_port name="rune_status" default="{rune_status}"/>
+        </Action>
+        <Action ID="SubTargetPos" editable="true">
+            <input_port name="topic_name" default="auto_aim_target_pos"/>
+            <input_port name="target_frame" default="map"/>
+            <input_port name="source_frame" default="body"/>
+            <output_port name="armors" default="{armors}"/>
+        </Action>
+        <Action ID="WaitDuration" editable="true">
+            <input_port name="duration_msec"/>
+        </Action>
+    </TreeNodesModel>
+</root>

@@ -1,0 +1,20 @@
+float32 		target
+float32 		kp
+float32 		ki
+float32 		kd
+float32 		measure			
+float32 		err			
+float32 		last_err			
+float32		    prepre_err	
+float32 		pout
+float32 		iout
+float32 		dout
+float32 		output		
+float32 		last_output			
+float32 		max_output			
+float32 		integral_limit			
+float32 		dead_band		  	
+
+float32 	    p_a				
+float32	     	p_b		
+float32	    	p_c			

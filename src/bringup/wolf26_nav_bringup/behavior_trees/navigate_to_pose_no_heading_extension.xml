@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Navigate to Pose with Replanning and Recovery (NO goal heading extension)
+
+  Same as the standard tree but without AppendGoalHeadingLineToPath.
+  Path is used directly from the planner without extension.
+-->
+<root BTCPP_format="4"
+      main_tree_to_execute="MainTree">
+  <TreeNodesModel>
+    <!-- Custom compute path action with edge waypoint fallback -->
+      <Action ID="ComputePathToPoseWithEdgeWaypoint">
+        <input_port name="goal">Destination to plan to</input_port>
+        <input_port name="start">Start pose of the robot if overriding current pose</input_port>
+        <input_port name="planner_id">Mapped name to the planner plugin type to use</input_port>
+        <input_port name="server_name">Server name</input_port>
+        <input_port name="server_timeout">Server timeout</input_port>
+        <input_port name="input_goal_is_temporary">Current goal is temporary</input_port>
+        <input_port name="temporary_goal_reached_tolerance">Distance threshold to consider temporary target reached</input_port>
+        <input_port name="global_costmap_service">Service name for global costmap (default: global_costmap/get_costmap)</input_port>
+        <input_port name="search_radius">Maximum radius around blocked goal to search</input_port>
+        <input_port name="search_resolution">Search resolution for blocked-goal candidates</input_port>
+        <input_port name="inflation_gradient_weight">Penalty for higher inflation cost candidates</input_port>
+        <input_port name="edge_search_resolution">Resolution (m) when searching edge waypoint</input_port>
+        <input_port name="edge_max_search_dist">Maximum distance (m) to search for edge point</input_port>
+        <input_port name="edge_minimum_travel_distance">Minimum robot-travel distance before treating edge waypoint as reached</input_port>
+        <output_port name="path">Path computed by the planner</output_port>
+        <output_port name="output_is_temporary_goal">Whether output_goal is temporary</output_port>
+        <output_port name="goal_source">Diagnostic source for selected goal</output_port>
+      </Action>
+    <Condition ID="GoalReached">
+      <input_port name="goal">Destination</input_port>
+      <input_port name="global_frame">Reference frame</input_port>
+      <input_port name="robot_base_frame">Robot base frame</input_port>
+    </Condition>
+    <Decorator ID="KeepRunningUntilFailure"/>
+  </TreeNodesModel>
+
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode name="NavigateRecovery"
+                  number_of_retries="10">
+      <ReactiveFallback name="NavigateUntilGoalReached">
+        <GoalReached goal="{goal}"
+                     global_frame="map"
+                     robot_base_frame="gimbal_yaw_fake"/>
+        <KeepRunningUntilFailure>
+          <PipelineSequence name="NavigateWithReplanning">
+              <RateController hz="6.0">
+              <PipelineSequence name="ComputePathOnly">
+                <RecoveryNode name="ComputePathToPose"
+                              number_of_retries="1">
+                  <ComputePathToPoseWithEdgeWaypoint goal="{goal}"
+                                                   input_goal_is_temporary="{is_temporary_goal}"
+                                                   path="{path}"
+                                                   output_is_temporary_goal="{is_temporary_goal}"
+                                                   goal_source="{path_goal_source}"
+                                                   robot_base_frame="gimbal_yaw_fake"
+                                                   planner_id="GridBased"
+                                                   temporary_goal_reached_tolerance="0.45"
+                                                   temporary_goal_stall_timeout="1.5"
+                                                   temporary_goal_stall_progress_distance="0.05"
+                                                   edge_minimum_travel_distance="0.35"
+                                                   search_radius="1.0"
+                                                   search_resolution="0.05"
+                                                   inflation_gradient_weight="1.0"
+                                                   global_costmap_service="global_costmap/get_costmap"/>
+                  <ClearEntireCostmap name="ClearGlobalCostmap-Context"
+                                      service_name="global_costmap/clear_entirely_global_costmap"/>
+                </RecoveryNode>
+              </PipelineSequence>
+            </RateController>
+            <RecoveryNode name="FollowPath"
+                          number_of_retries="10">
+              <FollowPath path="{path}"
+                          controller_id="FollowPath"/>
+              <ClearEntireCostmap name="ClearLocalCostmap-Context"
+                                 service_name="local_costmap/clear_entirely_local_costmap"/>
+            </RecoveryNode>
+          </PipelineSequence>
+        </KeepRunningUntilFailure>
+      </ReactiveFallback>
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <RoundRobin name="RecoveryActions">
+          <Sequence name="ClearingActions">
+            <ClearEntireCostmap name="ClearLocalCostmap-Subtree"
+                                service_name="local_costmap/clear_entirely_local_costmap"/>
+            <ClearEntireCostmap name="ClearGlobalCostmap-Subtree"
+                                service_name="global_costmap/clear_entirely_global_costmap"/>
+          </Sequence>
+          <BackUp backup_dist="0.5"
+                  backup_speed="0.2"/>
+        </RoundRobin>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>

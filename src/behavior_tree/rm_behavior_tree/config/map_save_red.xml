@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="Untitled">
+    <RunOnce then_skip="true">
+      <SequenceWithMemory>
+        <SendGoal goal_pose="-0.953477; 4.79666; 0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+        <Sleep msec="2000"/>
+        <SendGoal goal_pose="-3.75926; 4.23893; 0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+        <Sleep msec="2000"/>
+        <SendGoal goal_pose="-3.83005; 0.96433; 0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+        <Sleep msec="2000"/>
+        <SendGoal goal_pose="-6.70381; 0.37738; 0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+        <Sleep msec="2000"/>
+        <SendGoal goal_pose="-8.92424; 4.56194; 0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+      </SequenceWithMemory>
+    </RunOnce>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="SendGoal"
+            editable="true">
+      <input_port name="goal_pose"
+                  default="0;0;0; 0;0;0;1"/>
+      <input_port name="action_name"
+                  default="navigate_to_pose"/>
+    </Action>
+  </TreeNodesModel>
+
+</root>

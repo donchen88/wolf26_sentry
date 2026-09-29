@@ -1,0 +1,26 @@
+/move/rm_serial_driver_nav2_node:
+  ros__parameters:
+    device_name: /dev/ttyACM0
+    baud_rate: "115200"
+    flow_control: 'none'
+    parity: 'none'
+    stop_bits: "1"
+
+    # ---- 「目标相对当前底盘 yaw」计算参数 ----
+    # map 下的「全球」坐标系（一般 map）。
+    # TF 树里 frame 名都是全局的，不带 namespace。
+    global_frame: "map"
+    # 「当前底盘朝向」使用的 base frame。
+    # 必须是底盘固连的 frame（与雷达固连），不能是 gimbal_yaw（云台旋转会污染朝向）。
+    # 从 robot_state_publisher 的 TF 树看：odom → base_footprint → chassis。
+    # base_footprint 是 odom 系的子帧，也是底盘物理根 frame。
+    base_frame: "base_footprint"
+    # 期望底盘相对 map 系的「正方向」朝向（弧度）。
+    #   0      → 朝 map +X 轴
+    #   π/2    → 朝 map +Y 轴
+    #   -π/2   → 朝 map -Y 轴
+    # 取自 run_nav "Setting goal pose" log：盲道朝向 ≈ 1.5°
+    # Orientation(0, 0, 0.0131025, 0.999914) -> Angle 0.0262057 rad
+    expected_yaw: 1.42095  #0.0262057
+    # dyaw 指数平滑系数，0 表示不平滑(完全跟新值)；越大越平滑。范围 [0, 1]
+    yaw_smoothing_alpha: 0.7

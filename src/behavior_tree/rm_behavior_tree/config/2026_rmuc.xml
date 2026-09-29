@@ -1,0 +1,2238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4"
+      main_tree_to_execute="maintree">
+  <BehaviorTree ID="active">
+    <ReactiveSequence>
+      <SubAllRobotHP topic_name="robot_hp"
+                     robot_hp="{robot_hp}"/>
+      <SubAutoAimStatus topic_name="auto_aim_status"
+                        auto_aim_status="{auto_aim_status}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubChassisEnergy topic_name="chassis_energy"
+                        chassis_energy="{chassis_energy}"/>
+      <ReactiveFallback>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="5"
+                      lower_remain_time="0"
+                      higher_remain_time="0"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="3"
+                      lower_remain_time="1"
+                      higher_remain_time="3"/>
+          <RMSetBlackboard key="pass_shit_done"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_defense_4000_done"
+                           value="false"/>
+          <RMSetBlackboard key="chassis_energy_active_0_420_ok"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_defense_3000_done"
+                           value="false"/>
+          <RMSetBlackboard key="chassis_energy_active_back_shit"
+                           value="false"/>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="390"
+                      higher_remain_time="420"/>
+          <Inverter>
+            <GetBlackboard key="pass_shit_done"/>
+          </Inverter>
+          <SubTree ID="pass_shit"/>
+          <RMSetBlackboard key="pass_shit_done"
+                           value="true"/>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <Inverter>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="180"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="420"/>
+          </Sequence>
+          <Inverter>
+            <GetBlackboard key="low_hp_entered_active"/>
+          </Inverter>
+          <RMSetBlackboard key="back_once"
+                           value="false"/>
+          <RMSetBlackboard key="pass_once"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_entered_active"
+                           value="true"/>
+          <AlwaysFailure/>
+        </Sequence>
+        <Sequence>
+          <Fallback>
+            <GetBlackboard key="low_hp_running"/>
+            <Sequence>
+              <Inverter>
+                <IsStatusOK message="{robot_status}"
+                            hp_threshold="180"
+                            heat_threshold="30"
+                            barrel_heat_limit_threshold="500"/>
+              </Inverter>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="0"
+                          higher_remain_time="420"/>
+              <RMSetBlackboard key="low_hp_running"
+                               value="true"/>
+            </Sequence>
+          </Fallback>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="1"/>
+          <SequenceWithMemory>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <Sequence>
+              <Inverter>
+                <GetBlackboard key="back_once"/>
+              </Inverter>
+              <SubTree ID="back_shit"/>
+              <RMSetBlackboard key="back_once"
+                               value="true"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <SendGoal goal_pose="0.155669;-4.36266;0;0;0;-0.0117948;0.99993"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="0"/>
+              <RMSetBlackboard key="low_hp_defense_2000_done_normal"
+                               value="false"/>
+              <RMSetBlackboard key="chassis_energy_184_420_ok"
+                               value="false"/>
+              <WaitDuration duration_msec="5000"/>
+            </SequenceWithMemory>
+            <Fallback>
+              <Timeout msec="10000">
+                <RetryUntilSuccessful num_attempts="-1">
+                  <IsStatusOK message="{robot_status}"
+                              hp_threshold="400"
+                              heat_threshold="50"
+                              barrel_heat_limit_threshold="500"/>
+                </RetryUntilSuccessful>
+              </Timeout>
+              <AlwaysSuccess/>
+            </Fallback>
+            <Sequence>
+              <Inverter>
+                <IsChassisEnergyOK message="{chassis_energy}"/>
+              </Inverter>
+              <IsBaseStatusOK robot_hp="{robot_hp}"
+                              hp_threshold="1500"/>
+              <Inverter>
+                <GetBlackboard key="pass_once"/>
+              </Inverter>
+              <SubTree ID="pass_shit"/>
+              <RMSetBlackboard key="pass_once"
+                               value="true"/>
+            </Sequence>
+            <RMSetBlackboard key="low_hp_running"
+                             value="false"/>
+            <RMSetBlackboard key="low_hp_entered_active"
+                             value="false"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsChassisEnergyOK message="{chassis_energy}"/>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="150"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="420"/>
+          </Sequence>
+          <Inverter>
+            <GetBlackboard key="chassis_energy_active_back_shit"/>
+          </Inverter>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SubTree ID="back_shit"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="chassis_energy_active_back_shit"
+                           value="true"/>
+          <Inverter>
+            <GetBlackboard key="chassis_energy_active_0_420_ok"/>
+          </Inverter>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="3.82346; -0.755045; 0; 0; 0; 0.00080264; 1"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="chassis_energy_active_0_420_ok"
+                           value="true"/>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <Inverter>
+              <IsBaseStatusOK robot_hp="{robot_hp}"
+                              hp_threshold="1500"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="420"/>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="150"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+          </Sequence>
+          <Inverter>
+            <GetBlackboard key="back_shit_done_base"/>
+          </Inverter>
+          <SubTree ID="back_shit"/>
+          <RMSetBlackboard key="back_shit_done_base"
+                           value="true"/>
+          <SendGoal goal_pose="3.82346; -0.755045; 0; 0; 0; 0.00080264; 1"
+                    action_name="/red_standard_robot1/navigate_to_pose"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="1"/>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="2"/>
+          <WaitDuration duration_msec="10000"/>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="low_hp_defense_4000_done"/>
+          </Inverter>
+          <Inverter>
+            <IsBaseStatusOK robot_hp="{robot_hp}"
+                            hp_threshold="4000"/>
+          </Inverter>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="210"
+                      higher_remain_time="420"/>
+          <Fallback>
+            <Timeout msec="20000">
+              <SequenceWithMemory>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="1"/>
+                <SendGoal goal_pose="8.00901; -3.06937; 0; 0; 0; 0.171503; 0.985184"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="2"/>
+                <PubChassisMode topic_name="chassis_mode"
+                                chassis_mode="1"/>
+                <WaitDuration duration_msec="10000"/>
+              </SequenceWithMemory>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+          <AlwaysFailure/>
+          <RMSetBlackboard key="low_hp_defense_4000_done"
+                           value="true"/>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="low_hp_defense_3000_done"/>
+          </Inverter>
+          <Inverter>
+            <IsBaseStatusOK robot_hp="{robot_hp}"
+                            hp_threshold="3000"/>
+          </Inverter>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="120"
+                      higher_remain_time="420"/>
+          <Fallback>
+            <Timeout msec="20000">
+              <SequenceWithMemory>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="1"/>
+                <SendGoal goal_pose="8.00901; -3.06937; 0; 0; 0; 0.171503; 0.985184"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="2"/>
+                <PubChassisMode topic_name="chassis_mode"
+                                chassis_mode="1"/>
+                <WaitDuration duration_msec="10000"/>
+              </SequenceWithMemory>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+          <AlwaysFailure/>
+          <RMSetBlackboard key="low_hp_defense_3000_done"
+                           value="true"/>
+        </Sequence>
+        <Fallback>
+          <Sequence>
+            <Sequence>
+              <IsAttacked message="{robot_status}"
+                          hp_threshold="10"
+                          timeout_msec="10000"/>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="335"
+                          higher_remain_time="389"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="200"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubAutoAimMode topic_name="/auto_aim_mode"
+                            auto_aim_mode="3"/>
+            <Timeout msec="15000">
+              <SendGoal goal_pose="7.85907;3.11323;0;0;0;0.0374891;0.999297"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+            </Timeout>
+          </Sequence>
+          <Sequence>
+            <Sequence>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="335"
+                          higher_remain_time="389"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="200"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <SendGoal goal_pose="9.78077;0.639914;0;0;0;0.0347226;0.999397"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+            </SequenceWithMemory>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="3"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+          </Sequence>
+        </Fallback>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="293"
+                        higher_remain_time="334"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0;0;0;-0.422709;0.906265"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="12.5449; -2.95736; 0;0;0;-0.306042;0.952018"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <SendGoal goal_pose="8.00901; -3.06937; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="9.78077;0.639914;0;0;0;0.0347226;0.999397"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <WaitDuration duration_msec="8000"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="252"
+                        higher_remain_time="292"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0;0;0;-0.422709;0.906265"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="12.5449; -2.95736; 0;0;0;-0.306042;0.952018"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0;0;0;-0.422709;0.906265"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="13.3157;5.82095;0;0;0;-0.422709;0.906265"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <WaitDuration duration_msec="8000"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="216"
+                        higher_remain_time="251"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="13.3157;5.82095;0;0;0;-0.422709;0.906265"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <WaitDuration duration_msec="8000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="9.78077;0.639914;0;0;0;0.0347226;0.999397"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="8000"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="175"
+                        higher_remain_time="215"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="13.3157;5.82095;0;0;0;-0.422709;0.906265"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0;0;0;-0.306042;0.952018"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="12.5449; -2.95736; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="8.00901; -3.06937; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="8000"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="91"
+                        higher_remain_time="174"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <SendGoal goal_pose="9.78077;0.639914;0;0;0;0.0347226;0.999397"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="8000"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0;0;0;-0.306042;0.952018"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="12.5449; -2.95736; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0;0;0;-0.306042;0.952018"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="9.78077;0.639914;0;0;0;0.0347226;0.999397"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0;0;0;-0.306042;0.952018"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="12.5449; -2.95736; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <SendGoal goal_pose="8.00901; -3.06937; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="8000"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="90"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="9.78077;0.639914;0;0;0;0.0347226;0.999397"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="5000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="13.3157;5.82095;0;0;0;-0.422709;0.906265"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <WaitDuration duration_msec="10000"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="5000"/>
+            <SendGoal goal_pose="12.5449; -2.95736; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="5000"/>
+            <SendGoal goal_pose="12.0829;2.9841;0;0;0;-0.322331;0.946627"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="5000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <SendGoal goal_pose="9.78077;0.639914;0;0;0;0.0347226;0.999397"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="5000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="12.594; 2.14665; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="5000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="12.5449; -2.95736; 0; 0; 0; 0.171503; 0.985184"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+        </Sequence>
+      </ReactiveFallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="back_shit">
+    <SequenceWithMemory>
+      <PubAutoAimMode topic_name="auto_aim_mode"
+                      auto_aim_mode="0"/>
+      <PubRobotState topic_name="robot_state"
+                     robot_state="1"/>
+      <SendGoal goal_pose="-9.50404;8.98284;0;0.822143;0.56928"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <PubChassisMode topic_name="chassis_mode"
+                      chassis_mode="4"/>
+      <WaitDuration duration_msec="500"/>
+      <SendGoal goal_pose="-10.4911;11.3595;0;0.823605;0.567164"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <WaitDuration duration_msec="1000"/>
+      <PubChassisMode topic_name="chassis_mode"
+                      chassis_mode="2"/>
+      <SendGoal goal_pose="-12.136;15.4528;0;0.8243;0.566153"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <PubChassisMode topic_name="chassis_mode"
+                      chassis_mode="1"/>
+      <PubRobotState topic_name="robot_state"
+                     robot_state="1"/>
+    </SequenceWithMemory>
+  </BehaviorTree>
+
+  <BehaviorTree ID="dafu">
+    <ReactiveSequence>
+      <PubRobotState topic_name="robot_state"
+                     robot_state="3"/>
+      <SendGoal goal_pose="6.29012;4.0253;0;0;0;-0.388255;0.921552"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <PubAutoAimMode topic_name="auto_aim_mode"
+                      auto_aim_mode="1"/>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="defence">
+    <ReactiveSequence>
+      <SubAutoAimStatus topic_name="auto_aim_status"
+                        auto_aim_status="{auto_aim_status}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubAllRobotHP topic_name="robot_hp"
+                     robot_hp="{robot_hp}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <ReactiveFallback>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="3"
+                      lower_remain_time="2"
+                      higher_remain_time="5"/>
+          <RMSetBlackboard key="auto_aim_mode_change"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_defense_2000_done_defence"
+                           value="false"/>
+          <RMSetBlackboard key="defence_0_100_done"
+                           value="false"/>
+          <RMSetBlackboard key="defence_101_200_done"
+                           value="false"/>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="5"
+                      lower_remain_time="0"
+                      higher_remain_time="0"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="390"
+                      higher_remain_time="420"/>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="-1.43405;13.2848;0;-0.80033;0.599559"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="1"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <Inverter>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="120"
+                          heat_threshold="20"
+                          barrel_heat_limit_threshold="500"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="420"/>
+          </Sequence>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="1"/>
+          <PubAutoAimMode topic_name="auto_aim_mode"
+                          auto_aim_mode="0"/>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <SendGoal goal_pose="-11.788;17.6275;0;-0.999034;0.0439371"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <RMSetBlackboard key="defence_101_200_done"
+                             value="false"/>
+            <RMSetBlackboard key="low_hp_defense_2000_done_defence"
+                             value="false"/>
+            <RMSetBlackboard key="defence_0_100_done"
+                             value="false"/>
+            <WaitDuration duration_msec="5000"/>
+          </SequenceWithMemory>
+          <Fallback>
+            <Timeout msec="10000">
+              <RetryUntilSuccessful num_attempts="-1">
+                <IsStatusOK message="{robot_status}"
+                            hp_threshold="400"
+                            heat_threshold="50"
+                            barrel_heat_limit_threshold="500"/>
+              </RetryUntilSuccessful>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+        </Sequence>
+        <Sequence>
+          <GetBlackboard key="low_hp_defense_2000_done_defence"/>
+          <Sequence>
+            <Inverter>
+              <IsBaseStatusOK robot_hp="{robot_hp}"
+                              hp_threshold="1000"/>
+            </Inverter>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="120"
+                        heat_threshold="20"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="420"/>
+          </Sequence>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="1"/>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-6.27838;18.2824;0;-0.56576;0.82457"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="low_hp_defense_2000_done_defence"
+                           value="true"/>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="120"
+                        heat_threshold="20"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="341"
+                        higher_remain_time="389"/>
+          </Sequence>
+          <Inverter>
+            <GetBlackboard key="auto_aim_mode_change"/>
+          </Inverter>
+          <PubAutoAimMode topic_name="auto_aim_mode"
+                          auto_aim_mode="0"/>
+          <RMSetBlackboard key="auto_aim_mode_change"
+                           value="true"/>
+          <PubAutoAimMode topic_name="auto_aim_mode"
+                          auto_aim_mode="3"/>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <SendGoal goal_pose="0.188063;12.9474;0;-0.182677;0.983173"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="120"
+                        heat_threshold="20"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="271"
+                        higher_remain_time="340"/>
+          </Sequence>
+          <PubAutoAimMode topic_name="auto_aim_mode"
+                          auto_aim_mode="0"/>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="-2.50888;13.6042;0;-0.83757;0.54633"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="15000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="-7.11612;11.5254;0;-0.914694;0.404148"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="10000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="-5.28379;15.5772;0;-0.572188;0.820122"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="10000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="-0.0597138;15.8181;0;-0.768429;0.639935"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsBaseStatusOK robot_hp="{robot_hp}"
+                            hp_threshold="1000"/>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="120"
+                        heat_threshold="20"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="201"
+                        higher_remain_time="270"/>
+          </Sequence>
+          <PubAutoAimMode topic_name="auto_aim_mode"
+                          auto_aim_mode="0"/>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-2.50888;13.6042;0;-0.83757;0.54633"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="15000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="-7.11612;11.5254;0;-0.914694;0.404148"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="10000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-5.28379;15.5772;0;-0.572188;0.820122"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="10000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="-0.0597138;15.8181;0;-0.768429;0.639935"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Fallback>
+          <Sequence>
+            <Sequence>
+              <IsBaseAttacked all_robot_hp="{robot_hp}"
+                              hp_threshold="10"
+                              timeout_msec="10000"/>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="101"
+                          higher_remain_time="200"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="120"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="1"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="0"/>
+              <SendGoal goal_pose="-6.27838;18.2824;0;-0.56576;0.82457"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="3"/>
+              <RMSetBlackboard key="defence_101_200_done"
+                               value="false"/>
+              <WaitDuration duration_msec="10000"/>
+            </SequenceWithMemory>
+          </Sequence>
+          <Sequence>
+            <Inverter>
+              <GetBlackboard key="defence_101_200_done"/>
+            </Inverter>
+            <Sequence>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="101"
+                          higher_remain_time="200"/>
+              <IsBaseStatusOK robot_hp="{robot_hp}"
+                              hp_threshold="1000"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="120"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="1"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="0"/>
+              <SendGoal goal_pose="-0.0597138;15.8181;0;-0.768429;0.639935"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="2"/>
+              <WaitDuration duration_msec="10000"/>
+              <RMSetBlackboard key="defence_101_200_done"
+                               value="true"/>
+            </SequenceWithMemory>
+          </Sequence>
+        </Fallback>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="defence_0_100_done"/>
+          </Inverter>
+          <Sequence>
+            <IsBaseStatusOK robot_hp="{robot_hp}"
+                            hp_threshold="1000"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="100"/>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="120"
+                        heat_threshold="20"
+                        barrel_heat_limit_threshold="500"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="0"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-5.28379;15.5772;0;-0.572188;0.820122"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="defence_0_100_done"
+                           value="true"/>
+        </Sequence>
+      </ReactiveFallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="gohome">
+    <ReactiveFallback>
+      <Sequence>
+        <Sequence>
+          <Inverter>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="150"
+                        heat_threshold="1"
+                        barrel_heat_limit_threshold="500"/>
+          </Inverter>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="0"
+                      higher_remain_time="420"/>
+        </Sequence>
+        <PubRobotState topic_name="robot_state"
+                       robot_state="1"/>
+        <SequenceWithMemory>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="1"/>
+          <SendGoal goal_pose="0.0184216; 0.535184; 0; 0;0;0;1"
+                    action_name="/red_standard_robot1/navigate_to_pose"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+        </SequenceWithMemory>
+        <Timeout msec="10000">
+          <RetryUntilSuccessful num_attempts="-1">
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="400"
+                        heat_threshold="100"
+                        barrel_heat_limit_threshold="500"/>
+          </RetryUntilSuccessful>
+        </Timeout>
+      </Sequence>
+      <Sequence>
+        <Sequence>
+          <Inverter>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="100"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+          </Inverter>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="0"
+                      higher_remain_time="420"/>
+        </Sequence>
+        <PubRobotState topic_name="robot_state"
+                       robot_state="1"/>
+        <SequenceWithMemory>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+          <SendGoal goal_pose="0.0184216; 0.535184; 0; 0;0;0;1"
+                    action_name="/red_standard_robot1/navigate_to_pose"/>
+        </SequenceWithMemory>
+        <Timeout msec="10000">
+          <RetryUntilSuccessful num_attempts="-1">
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="400"
+                        heat_threshold="100"
+                        barrel_heat_limit_threshold="500"/>
+          </RetryUntilSuccessful>
+        </Timeout>
+      </Sequence>
+    </ReactiveFallback>
+  </BehaviorTree>
+
+  <BehaviorTree ID="high_ground">
+    <Sequence>
+      <IsGameTime message="{game_status}"
+                  game_progress="4"
+                  lower_remain_time="0"
+                  higher_remain_time="300"/>
+      <SubTree ID="pass_shit"/>
+      <Sequence>
+        <SendGoal goal_pose="11.8645;0.00682527;0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+      </Sequence>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="hit_enemy">
+    <Sequence>
+      <PubAutoAimMode topic_name="/auto_aim_mode"
+                      auto_aim_mode="0"/>
+      <Fallback>
+        <Sequence>
+          <IsAttacked message="{robot_status}"
+                      hp_threshold="10"
+                      timeout_msec="10000"/>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="3"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="1"/>
+        </Sequence>
+        <Sequence>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="3"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+        </Sequence>
+      </Fallback>
+    </Sequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="judge_outpost">
+    <Fallback>
+      <Sequence>
+        <IsOutpostOK all_robot_hp="{robot_hp}"
+                     hp_threshold="10"/>
+        <SequenceWithMemory>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="1"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+          <SendGoal goal_pose="3.58;3.62;0; 0;0;0;1"
+                    action_name="/red_standard_robot1/navigate_to_pose"/>
+        </SequenceWithMemory>
+      </Sequence>
+      <Sequence>
+        <PubRobotState topic_name="robot_state"
+                       robot_state="1"/>
+        <SequenceWithMemory>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+          <SendGoal goal_pose="2.97;-1.43;0; 0;0;0;1"
+                    action_name="/red_standard_robot1/navigate_to_pose"/>
+        </SequenceWithMemory>
+      </Sequence>
+    </Fallback>
+  </BehaviorTree>
+
+  <BehaviorTree ID="maintree">
+    <ReactiveSequence>
+      <SubAutoAimStatus topic_name="auto_aim_status"
+                        auto_aim_status="{auto_aim_status}"/>
+      <SubRemoteStatus topic_name="remote_status"
+                       remote_status="{remote_status}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubAllRobotHP topic_name="robot_hp"
+                     robot_hp="{robot_hp}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <SubGimbalTarget topic_name="gimbal_target_point"
+                       gimbal_frame="gimbal_field"
+                       gimbal_origin_x="0.0"
+                       gimbal_origin_y="0.0"
+                       gimbal_origin_z="0.0"
+                       gimbal_yaw="0.0"
+                       target_pose="{gimbal_target_pose}"
+                       target_valid="{gimbal_target_valid}"
+                       target_x="{gimbal_target_x}"
+                       target_y="{gimbal_target_y}"/>
+      <ReactiveFallback>
+        <Sequence>
+          <SequenceWithMemory>
+            <ReactiveSequence>
+              <IsGimbalTargetValid message="{gimbal_target_valid}"
+                                  target_x="{gimbal_target_x}"
+                                  target_y="{gimbal_target_y}"
+                                  target_timeout_ms="15000"/>
+            </ReactiveSequence>
+            <SendGoal goal_pose="{gimbal_target_pose}"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <IsAutoAimOK message="{auto_aim_status}"
+                       target_status="1"/>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <IsRemoteStatus message="{remote_status}"
+                          target_status="1"/>
+          <SubTree ID="normal"/>
+        </Sequence>
+        <Sequence>
+          <IsRemoteStatus message="{remote_status}"
+                          target_status="2"/>
+          <SubTree ID="defence"/>
+        </Sequence>
+        <Sequence>
+          <IsRemoteStatus message="{remote_status}"
+                          target_status="3"/>
+          <SubTree ID="active"/>
+        </Sequence>
+      </ReactiveFallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="normal">
+    <ReactiveSequence>
+      <SubAutoAimStatus topic_name="auto_aim_status"
+                        auto_aim_status="{auto_aim_status}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <SubAllRobotHP topic_name="robot_hp"
+                     robot_hp="{robot_hp}"/>
+      <SubChassisEnergy topic_name="chassis_energy"
+                        chassis_energy="{chassis_energy}"/>
+      <ReactiveFallback>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="5"
+                      lower_remain_time="0"
+                      higher_remain_time="0"/>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="0"/>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="3"
+                      lower_remain_time="1"
+                      higher_remain_time="3"/>
+          <RMSetBlackboard key="pass_shit_done_normal"
+                           value="false"/>
+          <RMSetBlackboard key="back_shit_done_normal"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_defense_4000_done_normal"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_defense_3000_done_normal"
+                           value="false"/>
+          <RMSetBlackboard key="chassis_energy_back_shit"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_defense_2000_done_normal"
+                           value="false"/>
+          <RMSetBlackboard key="normal_101_184_done"
+                           value="false"/>
+          <RMSetBlackboard key="normal_0_101_done"
+                           value="false"/>
+          <RMSetBlackboard key="chassis_energy_184_420_ok"
+                           value="false"/>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <Inverter>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="180"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="210"
+                        higher_remain_time="420"/>
+          </Sequence>
+          <Inverter>
+            <GetBlackboard key="low_hp_entered"/>
+          </Inverter>
+          <RMSetBlackboard key="back_once"
+                           value="false"/>
+          <RMSetBlackboard key="pass_once"
+                           value="false"/>
+          <RMSetBlackboard key="low_hp_entered"
+                           value="true"/>
+          <AlwaysFailure/>
+        </Sequence>
+        <Sequence>
+          <Fallback>
+            <GetBlackboard key="low_hp_running"/>
+            <Sequence>
+              <Inverter>
+                <IsStatusOK message="{robot_status}"
+                            hp_threshold="180"
+                            heat_threshold="30"
+                            barrel_heat_limit_threshold="500"/>
+              </Inverter>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="210"
+                          higher_remain_time="420"/>
+              <RMSetBlackboard key="low_hp_running"
+                               value="true"/>
+            </Sequence>
+          </Fallback>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="1"/>
+          <SequenceWithMemory>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <Sequence>
+              <Inverter>
+                <GetBlackboard key="back_once"/>
+              </Inverter>
+              <SubTree ID="back_shit"/>
+              <RMSetBlackboard key="back_once"
+                               value="true"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="2"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <SendGoal goal_pose="-11.788;17.6275;0;-0.999034;0.0439371"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="0"/>
+              <RMSetBlackboard key="low_hp_defense_2000_done_normal"
+                               value="false"/>
+              <RMSetBlackboard key="chassis_energy_184_420_ok"
+                               value="false"/>
+              <WaitDuration duration_msec="5000"/>
+            </SequenceWithMemory>
+            <Fallback>
+              <Timeout msec="10000">
+                <RetryUntilSuccessful num_attempts="-1">
+                  <IsStatusOK message="{robot_status}"
+                              hp_threshold="400"
+                              heat_threshold="50"
+                              barrel_heat_limit_threshold="500"/>
+                </RetryUntilSuccessful>
+              </Timeout>
+              <AlwaysSuccess/>
+            </Fallback>
+            <Sequence>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="210"
+                          higher_remain_time="420"/>
+              <Inverter>
+                <GetBlackboard key="pass_once"/>
+              </Inverter>
+              <SubTree ID="pass_shit"/>
+              <RMSetBlackboard key="pass_once"
+                               value="true"/>
+            </Sequence>
+            <RMSetBlackboard key="low_hp_running"
+                             value="false"/>
+            <RMSetBlackboard key="low_hp_entered"
+                             value="false"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="390"
+                      higher_remain_time="420"/>
+          <Inverter>
+            <GetBlackboard key="pass_shit_done_normal"/>
+          </Inverter>
+          <SubTree ID="pass_shit"/>
+          <RMSetBlackboard key="pass_shit_done_normal"
+                           value="true"/>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <Inverter>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="100"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="185"
+                        higher_remain_time="209"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <SendGoal goal_pose="-11.788;17.6275;0;-0.999034;0.0439371"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <RMSetBlackboard key="low_hp_defense_2000_done_normal"
+                             value="false"/>
+            <RMSetBlackboard key="normal_0_101_done"
+                             value="false"/>
+            <RMSetBlackboard key="normal_101_184_done"
+                             value="false"/>
+            <WaitDuration duration_msec="5000"/>
+          </SequenceWithMemory>
+          <Fallback>
+            <Timeout msec="10000">
+              <RetryUntilSuccessful num_attempts="-1">
+                <IsStatusOK message="{robot_status}"
+                            hp_threshold="400"
+                            heat_threshold="50"
+                            barrel_heat_limit_threshold="500"/>
+              </RetryUntilSuccessful>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <Inverter>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="130"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="161"
+                        higher_remain_time="184"/>
+          </Sequence>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="1"/>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-11.788;17.6275;0;-0.999034;0.0439371"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <RMSetBlackboard key="low_hp_defense_2000_done_normal"
+                             value="false"/>
+            <RMSetBlackboard key="normal_101_184_done"
+                             value="false"/>
+            <RMSetBlackboard key="normal_0_101_done"
+                             value="false"/>
+            <WaitDuration duration_msec="5000"/>
+          </SequenceWithMemory>
+          <Fallback>
+            <Timeout msec="10000">
+              <RetryUntilSuccessful num_attempts="-1">
+                <IsStatusOK message="{robot_status}"
+                            hp_threshold="400"
+                            heat_threshold="50"
+                            barrel_heat_limit_threshold="500"/>
+              </RetryUntilSuccessful>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <Inverter>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="130"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="160"/>
+          </Sequence>
+          <PubRobotState topic_name="robot_state"
+                         robot_state="1"/>
+          <SequenceWithMemory>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <SendGoal goal_pose="-11.788;17.6275;0;-0.999034;0.0439371"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <RMSetBlackboard key="low_hp_defense_2000_done_normal"
+                             value="false"/>
+            <RMSetBlackboard key="normal_101_184_done"
+                             value="false"/>
+            <RMSetBlackboard key="normal_0_101_done"
+                             value="false"/>
+            <WaitDuration duration_msec="5000"/>
+          </SequenceWithMemory>
+          <Fallback>
+            <Timeout msec="10000">
+              <RetryUntilSuccessful num_attempts="-1">
+                <IsStatusOK message="{robot_status}"
+                            hp_threshold="400"
+                            heat_threshold="50"
+                            barrel_heat_limit_threshold="500"/>
+              </RetryUntilSuccessful>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="pass_shit_done_normal"/>
+          </Inverter>
+          <Inverter>
+            <GetBlackboard key="chassis_energy_184_420_ok"/>
+          </Inverter>
+          <Sequence>
+            <IsChassisEnergyOK message="{chassis_energy}"/>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="180"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="210"
+                        higher_remain_time="300"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="0"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <Inverter>
+              <GetBlackboard key="chassis_energy_back_shit"/>
+            </Inverter>
+            <SubTree ID="back_shit"/>
+            <RMSetBlackboard key="chassis_energy_back_shit"
+                             value="true"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-5.28379;15.5772;0;-0.572188;0.820122"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="20000"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="chassis_energy_184_420_ok"
+                           value="true"/>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="low_hp_defense_4000_done_normal"/>
+          </Inverter>
+          <Inverter>
+            <IsBaseStatusOK robot_hp="{robot_hp}"
+                            hp_threshold="4000"/>
+          </Inverter>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="210"
+                      higher_remain_time="420"/>
+          <Fallback>
+            <Timeout msec="20000">
+              <SequenceWithMemory>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="1"/>
+                <SendGoal goal_pose="-7.20015;9.38672;0;0.0847171;0.996405"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="2"/>
+                <PubChassisMode topic_name="chassis_mode"
+                                chassis_mode="1"/>
+                <WaitDuration duration_msec="10000"/>
+              </SequenceWithMemory>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+          <RMSetBlackboard key="low_hp_defense_4000_done_normal"
+                           value="true"/>
+          <AlwaysFailure/>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="low_hp_defense_3000_done_normal"/>
+          </Inverter>
+          <Inverter>
+            <IsBaseStatusOK robot_hp="{robot_hp}"
+                            hp_threshold="3000"/>
+          </Inverter>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="210"
+                      higher_remain_time="420"/>
+          <Fallback>
+            <Timeout msec="20000">
+              <SequenceWithMemory>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="1"/>
+                <SendGoal goal_pose="-7.20015;9.38672;0;0.0847171;0.996405"
+                          action_name="/red_standard_robot1/navigate_to_pose"/>
+                <PubRobotState topic_name="robot_state"
+                               robot_state="2"/>
+                <PubChassisMode topic_name="chassis_mode"
+                                chassis_mode="1"/>
+                <WaitDuration duration_msec="10000"/>
+              </SequenceWithMemory>
+            </Timeout>
+            <AlwaysSuccess/>
+          </Fallback>
+          <RMSetBlackboard key="low_hp_defense_3000_done_normal"
+                           value="true"/>
+          <AlwaysFailure/>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="low_hp_defense_2000_done_normal"/>
+          </Inverter>
+          <Sequence>
+            <Inverter>
+              <IsBaseStatusOK robot_hp="{robot_hp}"
+                              hp_threshold="2000"/>
+            </Inverter>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="184"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-5.28379;15.5772;0;-0.572188;0.820122"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="low_hp_defense_2000_done_normal"
+                           value="true"/>
+        </Sequence>
+        <Fallback>
+          <Sequence>
+            <Sequence>
+              <IsAttacked message="{robot_status}"
+                          hp_threshold="10"
+                          timeout_msec="10000"/>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="335"
+                          higher_remain_time="389"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="200"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="3"/>
+            <Timeout msec="15000">
+              <SendGoal goal_pose="0.432784;11.6163;0;-0.57985;0.814723"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+            </Timeout>
+          </Sequence>
+          <Sequence>
+            <Sequence>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="335"
+                          higher_remain_time="389"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="200"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <RMSetBlackboard key="back_once"
+                               value="false"/>
+              <RMSetBlackboard key="pass_once"
+                               value="false"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <SendGoal goal_pose="-0.433371;9.27;0;-0.355035;0.934853"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+            </SequenceWithMemory>
+            <PubAutoAimMode topic_name="auto_aim_mode"
+                            auto_aim_mode="3"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+          </Sequence>
+        </Fallback>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="293"
+                        higher_remain_time="334"/>
+          </Sequence>
+          <PubChassisMode topic_name="chassis_mode"
+                          chassis_mode="1"/>
+          <PubAutoAimMode topic_name="/auto_aim_mode"
+                          auto_aim_mode="0"/>
+          <SequenceWithMemory>
+            <RMSetBlackboard key="back_once"
+                             value="false"/>
+            <RMSetBlackboard key="pass_once"
+                             value="false"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="4.71389;6.6921;0;-0.940408;0.340047"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="1.34558;6.67103;0;-0.621111;0.783723"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="-3.9001;4.9121;0;-0.900972;0.433876"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="-7.20015;9.38672;0;0.0847171;0.996405"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <WaitDuration duration_msec="8000"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="252"
+                        higher_remain_time="292"/>
+          </Sequence>
+          <PubAutoAimMode topic_name="/auto_aim_mode"
+                          auto_aim_mode="0"/>
+          <SequenceWithMemory>
+            <RMSetBlackboard key="back_once"
+                             value="false"/>
+            <RMSetBlackboard key="pass_once"
+                             value="false"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="-0.433371;9.27;0;-0.355035;0.934853"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SendGoal goal_pose="1.34558;6.67103;0;-0.621111;0.783723"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <SendGoal goal_pose="-3.9001;4.9121;0;-0.900972;0.433876"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="-7.20015;9.38672;0;0.0847171;0.996405"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <WaitDuration duration_msec="8000"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="185"
+                      higher_remain_time="209"/>
+          <Inverter>
+            <GetBlackboard key="back_shit_done_normal"/>
+          </Inverter>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <SubTree ID="back_shit"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="back_shit_done_normal"
+                           value="true"/>
+        </Sequence>
+        <Sequence>
+          <Sequence>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="200"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="210"
+                        higher_remain_time="251"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <RMSetBlackboard key="pass_once"
+                             value="false"/>
+            <RMSetBlackboard key="back_once"
+                             value="false"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-0.433371;9.27;0;-0.355035;0.934853"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="1.34558;6.67103;0;-0.621111;0.783723"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <WaitDuration duration_msec="4000"/>
+            <SendGoal goal_pose="-3.9001;4.9121;0;-0.900972;0.433876"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <WaitDuration duration_msec="4000"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="2"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="1"/>
+            <SendGoal goal_pose="-7.20015;9.38672;0;0.0847171;0.996405"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="10000"/>
+            <PubSuperCapacitor topic_name="super_capacitor"
+                               super_capacitor_state="0"/>
+          </SequenceWithMemory>
+        </Sequence>
+        <Sequence>
+          <Inverter>
+            <GetBlackboard key="normal_0_101_done"/>
+          </Inverter>
+          <Sequence>
+            <IsGameTime message="{game_status}"
+                        game_progress="4"
+                        lower_remain_time="0"
+                        higher_remain_time="100"/>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="130"
+                        heat_threshold="30"
+                        barrel_heat_limit_threshold="500"/>
+          </Sequence>
+          <SequenceWithMemory>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="1"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="0"/>
+            <SendGoal goal_pose="-5.28379;15.5772;0;-0.572188;0.820122"
+                      action_name="/red_standard_robot1/navigate_to_pose"/>
+            <PubChassisMode topic_name="chassis_mode"
+                            chassis_mode="1"/>
+            <PubRobotState topic_name="robot_state"
+                           robot_state="3"/>
+            <WaitDuration duration_msec="10000"/>
+          </SequenceWithMemory>
+          <RMSetBlackboard key="normal_0_101_done"
+                           value="true"/>
+        </Sequence>
+        <Fallback>
+          <Sequence>
+            <Sequence>
+              <Inverter>
+                <IsBaseStatusOK robot_hp="{robot_hp}"
+                                hp_threshold="2000"/>
+              </Inverter>
+              <IsBaseAttacked all_robot_hp="{robot_hp}"
+                              hp_threshold="10"
+                              timeout_msec="10000"/>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="101"
+                          higher_remain_time="184"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="130"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="1"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <SendGoal goal_pose="-5.28379;15.5772;0;-0.572188;0.820122"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+              <PubSuperCapacitor topic_name="super_capacitor"
+                                 super_capacitor_state="1"/>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="2"/>
+              <RMSetBlackboard key="normal_101_184_done"
+                               value="false"/>
+              <WaitDuration duration_msec="10000"/>
+              <PubSuperCapacitor topic_name="super_capacitor"
+                                 super_capacitor_state="0"/>
+            </SequenceWithMemory>
+          </Sequence>
+          <Sequence>
+            <Inverter>
+              <GetBlackboard key="normal_101_184_done"/>
+            </Inverter>
+            <Sequence>
+              <IsGameTime message="{game_status}"
+                          game_progress="4"
+                          lower_remain_time="101"
+                          higher_remain_time="184"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="130"
+                          heat_threshold="30"
+                          barrel_heat_limit_threshold="500"/>
+            </Sequence>
+            <SequenceWithMemory>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="1"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="0"/>
+              <SendGoal goal_pose="-0.0597138;15.8181;0;-0.768429;0.639935"
+                        action_name="/red_standard_robot1/navigate_to_pose"/>
+              <PubChassisMode topic_name="chassis_mode"
+                              chassis_mode="1"/>
+              <PubRobotState topic_name="robot_state"
+                             robot_state="2"/>
+              <WaitDuration duration_msec="10000"/>
+            </SequenceWithMemory>
+            <RMSetBlackboard key="normal_101_184_done"
+                             value="true"/>
+          </Sequence>
+        </Fallback>
+      </ReactiveFallback>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <BehaviorTree ID="outpost">
+    <SequenceWithMemory>
+      <PubRobotState topic_name="robot_state"
+                     robot_state="1"/>
+      <SendGoal goal_pose="8.37223;4.03626;0; 0;0;0;1"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <PubAutoAimMode topic_name="/auto_aim_mode"
+                      auto_aim_mode="0"/>
+    </SequenceWithMemory>
+  </BehaviorTree>
+
+  <BehaviorTree ID="pass_shit">
+    <SequenceWithMemory>
+      <PubRobotState topic_name="robot_state"
+                     robot_state="1"/>
+      <SendGoal goal_pose="-9.00451;12.612;0;-0.981235;0.192815"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <PubChassisMode topic_name="chassis_mode"
+                      chassis_mode="3"/>
+      <WaitDuration duration_msec="500"/>
+      <SendGoal goal_pose="-12.0976;14.8856;0;-0.983284;0.182077"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <WaitDuration duration_msec="1000"/>
+      <PubChassisMode topic_name="chassis_mode"
+                      chassis_mode="2"/>
+      <SendGoal goal_pose="-9.85718;9.53646;0;-0.579126;0.815238"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <PubChassisMode topic_name="chassis_mode"
+                      chassis_mode="0"/>
+      <SendGoal goal_pose="-7.20015;9.38672;0;0.0847171;0.996405"
+                action_name="/red_standard_robot1/navigate_to_pose"/>
+      <PubChassisMode topic_name="chassis_mode"
+                      chassis_mode="1"/>
+    </SequenceWithMemory>
+  </BehaviorTree>
+
+  <BehaviorTree ID="trackenemy">
+    <Fallback>
+      <Sequence>
+        <IsDetectEnemy message="{armors}"
+                       max_range="3"
+                       current_location="{current_location}"/>
+        <PubRobotState topic_name="robot_state"
+                       robot_state="0"/>
+        <PubChassisMode topic_name="chassis_mode"
+                        chassis_mode="1"/>
+        <PursueEnemy armors="{armors}"
+                     current_location="{current_location}"
+                     pursue_radius="1.5"
+                     update_interval="0.3"
+                     action_name="/red_standard_robot1/navigate_to_pose"
+                     target_frame="map"
+                     robot_base_frame="base_link"/>
+        <SubTree ID="hit_enemy"/>
+      </Sequence>
+      <Sequence>
+        <IsDetectEnemy message="{armors}"
+                       max_range="-1.0"
+                       current_location="{current_location}"/>
+        <SubTree ID="hit_enemy"/>
+      </Sequence>
+      <SubTree ID="judge_outpost"/>
+    </Fallback>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Condition ID="GetBlackboard"
+               editable="true">
+      <input_port name="key"/>
+    </Condition>
+    <Action ID="IsAttacked"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_status}"/>
+      <input_port name="hp_threshold"
+                  default="10"/>
+      <input_port name="timeout_msec"
+                  default="10000"/>
+    </Action>
+    <Condition ID="IsBaseAttacked"
+               editable="true">
+      <input_port name="all_robot_hp"
+                  default="{robot_hp}"/>
+      <input_port name="hp_threshold"
+                  default="10"/>
+      <input_port name="timeout_msec"
+                  default="10000"/>
+    </Condition>
+    <Condition ID="IsBaseStatusOK"
+               editable="true">
+      <input_port name="robot_hp"
+                  default="{robot_hp}"/>
+      <input_port name="hp_threshold"
+                  default="0"/>
+    </Condition>
+    <Condition ID="IsChassisEnergyOK"
+               editable="true">
+      <input_port name="message"
+                  default="{chassis_energy}"/>
+    </Condition>
+    <Action ID="IsDetectEnemy"
+            editable="true">
+      <input_port name="message"
+                  default="{armors}"/>
+      <input_port name="max_range"
+                  default="-1.0"/>
+      <input_port name="current_location"/>
+    </Action>
+    <Action ID="IsGameTime"
+            editable="true">
+      <input_port name="message"
+                  default="{game_status}"/>
+      <input_port name="game_progress"
+                  default="4"/>
+      <input_port name="lower_remain_time"
+                  default="0"/>
+      <input_port name="higher_remain_time"
+                  default="300"/>
+    </Action>
+    <Condition ID="IsGimbalTargetValid"
+               editable="true">
+      <input_port name="message"
+                  default="{gimbal_target_valid}">云台手目标点是否有效</input_port>
+      <input_port name="target_x"
+                  default="{gimbal_target_x}">云台目标点 x (gimbal_frame)</input_port>
+      <input_port name="target_y"
+                  default="{gimbal_target_y}">云台目标点 y (gimbal_frame)</input_port>
+      <input_port name="target_timeout_ms"
+                  default="5000">目标点超时时间(毫秒)，超时后返回 FAILURE</input_port>
+    </Condition>
+    <Action ID="IsOutpostOK"
+            editable="true">
+      <input_port name="all_robot_hp"
+                  default="{robot_hp}"/>
+      <input_port name="hp_threshold"
+                  default="10"/>
+    </Action>
+    <Condition ID="IsRemoteStatus"
+               editable="true">
+      <input_port name="message"
+                  default="{remote_status}"/>
+      <input_port name="target_status"
+                  default="1">当前遥控器模式：1=正常，2=保守，3=激进&#10;</input_port>
+    </Condition>
+    <Action ID="IsStatusOK"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_status}"/>
+      <input_port name="hp_threshold"
+                  default="100"/>
+      <input_port name="heat_threshold"
+                  default="350"/>
+      <input_port name="barrel_heat_limit_threshold"
+                  default="0"/>
+    </Action>
+    <Action ID="PubAutoAimMode"
+            editable="true">
+      <input_port name="topic_name"
+                  default="auto_aim_mode"/>
+      <input_port name="auto_aim_mode"
+                  default="0">0 = 默认瞄敌人&#10;1 = 瞄小符&#10;2 = 瞄大符&#10;3 = 瞄前哨&#10;4 = 恢复底盘速度&#10;5 = 加速底盘旋转</input_port>
+    </Action>
+    <Action ID="PubChassisMode"
+            editable="true">
+      <input_port name="topic_name"
+                  default="chassis_mode"/>
+      <input_port name="chassis_mode"
+                  default="0">0=正常底盘速度, 1=加速底盘旋转, 2=过起伏路段, 3=超电状态</input_port>
+    </Action>
+    <Action ID="PubRobotState"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_state"/>
+      <input_port name="robot_state"
+                  default="1">1=移动姿态，2=防御姿态，3=进攻姿态</input_port>
+    </Action>
+    <Action ID="PubSuperCapacitor"
+            editable="true">
+      <input_port name="topic_name"
+                  default="super_capacitor"/>
+      <input_port name="super_capacitor_state"
+                  default="0">0=关闭超电, 1=开启超电</input_port>
+    </Action>
+    <Action ID="PursueEnemy"
+            editable="true">
+      <input_port name="armors"
+                  default="{armors}"/>
+      <input_port name="current_location"
+                  default="{current_location}"/>
+      <input_port name="pursue_radius"
+                  default="1.5">攻击半径/m</input_port>
+      <inout_port name="update_interval"
+                  default="0.5">更新频率/s</inout_port>
+      <input_port name="action_name"
+                  default="/red_standard_robot1/navigate_to_pose"/>
+      <input_port name="target_frame"
+                  default="map">目标坐标系</input_port>
+      <input_port name="robot_base_frame"
+                  default="base_link">机器人基座坐标系</input_port>
+    </Action>
+    <Action ID="RMSetBlackboard"
+            editable="true">
+      <input_port name="key">blackboard key (string)，写入的键名</input_port>
+      <input_port name="value"
+                  default="true">要写入的布尔值 (true/false)</input_port>
+    </Action>
+    <Action ID="SendGoal"
+            editable="true">
+      <input_port name="goal_pose"
+                  default="0;0;0; 0;0;0;1"/>
+      <input_port name="action_name"
+                  default="navigate_to_pose"/>
+    </Action>
+    <Action ID="SubAllRobotHP"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_hp"/>
+      <output_port name="robot_hp"
+                   default="{robot_hp}"/>
+    </Action>
+    <Action ID="SubAutoAimStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="auto_aim_status"/>
+      <input_port name="auto_aim_status"
+                  default="{auto_aim_status}"/>
+    </Action>
+    <Action ID="SubChassisEnergy"
+            editable="true">
+      <input_port name="topic_name"
+                  default="chassis_energy"/>
+      <output_port name="chassis_energy"
+                   default="{chassis_energy}"/>
+    </Action>
+    <Action ID="SubGameStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="game_status"/>
+      <output_port name="game_status"
+                   default="{game_status}"/>
+    </Action>
+    <Action ID="SubGimbalTarget"
+            editable="true">
+      <input_port name="topic_name"
+                  default="gimbal_target_point">云台手发送目标点的话题</input_port>
+      <input_port name="corner_origin"
+                  default="bottom_left">原点角落: bottom_left, bottom_right, top_right, top_left</input_port>
+      <inout_port name="field_length"
+                  default="28.0">赛场长度(米)</inout_port>
+      <input_port name="field_width"
+                  default="15.0">赛场宽度(米)</input_port>
+      <input_port name="origin_in_map_x"
+                  default="0.0">赛场原点在哨兵map中的X偏移</input_port>
+      <input_port name="origin_in_map_y"
+                  default="0.0">赛场原点在哨兵map中的Y偏移</input_port>
+      <output_port name="target_pose"
+                   default="{gimbal_target_pose}">转换后的目标点 PoseStamped</output_port>
+      <output_port name="target_valid"
+                   default="{gimbal_target_valid}">是否有有效的云台手目标点</output_port>
+    </Action>
+    <Action ID="SubRemoteStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="remote_status"/>
+      <input_port name="remote_status"
+                  default="{remote_status}"/>
+    </Action>
+    <Action ID="SubRobotStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_status"/>
+      <output_port name="robot_status"
+                   default="{robot_status}"/>
+    </Action>
+    <Action ID="WaitDuration"
+            editable="true">
+      <input_port name="duration_msec"/>
+    </Action>
+  </TreeNodesModel>
+
+</root>

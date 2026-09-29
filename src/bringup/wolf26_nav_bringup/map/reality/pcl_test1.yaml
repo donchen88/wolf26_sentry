@@ -1,0 +1,7 @@
+image: pcl_test1.pgm
+mode: trinary
+resolution: 0.03
+origin: [-4.5, -9.85, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25

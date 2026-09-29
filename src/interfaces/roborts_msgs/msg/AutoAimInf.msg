@@ -1,0 +1,1 @@
+int32 autoaim_mode

@@ -1,0 +1,28 @@
+# 只做静态卫生检查，不做编译（编译在 CI 里会因 Livox SDK2 / openvdb 失败）。
+# 首次提交请用 git commit --no-verify，避免一次性重排 46 个 BT xml 产生噪音 commit。
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ['--maxkb=2048']   # 防止 pcd / 大图再次混入
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-xml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: fix-byte-order-marker
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v14.0.3
+    hooks:
+      - id: clang-format

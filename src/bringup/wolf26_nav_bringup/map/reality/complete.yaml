@@ -1,0 +1,7 @@
+image: complete.pgm
+mode: trinary
+resolution: 0.03
+origin: [-3.65, -9.87, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25

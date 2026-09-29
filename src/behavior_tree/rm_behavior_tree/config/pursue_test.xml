@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="pursue_test">
+    <Fallback>
+      <!-- 优先级最高：状态判断，如果状态不好，直接回家 -->
+      <Sequence>
+        <Inverter>
+          <IsStatusOK message="{robot_status}"
+                      hp_threshold="100"
+                      heat_threshold="350"/>
+        </Inverter>
+        <!-- 状态不好，返回固定点 -->
+        <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+      </Sequence>
+      
+      <!-- 优先级次之：正常追击流程 -->
+      <Sequence>
+        <!-- 订阅敌人信息（如果通过其他方式获取，可以省略） -->
+        <SubArmors topic_name="/detector/armors"
+                   armors="{armors}"/>
+        
+        <!-- 获取当前位置 -->
+        <GetCurrentLocation current_location="{current_location}"
+                            target_frame="map"
+                            source_frame="base_link"
+                            odometry_topic="/red_standard_robot1/odometry"/>
+        
+        <!-- 检测是否有敌人在追击范围内（例如：5米内） -->
+        <IsDetectEnemy message="{armors}"
+                       max_range="5.0"
+                       current_location="{current_location}"/>
+        
+        <!-- 持续追击敌人：持续发点，敌方有位移也重新发点 -->
+        <PursueEnemy armors="{armors}"
+                     current_location="{current_location}"
+                     pursue_radius="2.0"
+                     update_interval="0.5"
+                     action_name="/red_standard_robot1/navigate_to_pose"
+                     target_frame="map"
+                     robot_base_frame="base_link"/>
+        
+        <!-- 追击停止后（敌人超出范围或没有敌人），返回固定点 -->
+        <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                  action_name="/red_standard_robot1/navigate_to_pose"/>
+      </Sequence>
+    </Fallback>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="SubArmors"
+            editable="true">
+      <input_port name="topic_name"
+                  default="/detector/armors"/>
+      <output_port name="armors"
+                   default="{armors}"/>
+    </Action>
+    <Action ID="IsDetectEnemy"
+            editable="true">
+      <input_port name="message"
+                  default="{armors}"/>
+      <input_port name="max_range"
+                  default="-1.0"
+                  description="Maximum detection range in meters (distance from robot to enemy), -1 means no limit"/>
+      <input_port name="current_location"
+                  default=""
+                  description="Robot current location for accurate distance calculation (optional)"/>
+    </Action>
+    <Action ID="GetCurrentLocation"
+            editable="true">
+      <output_port name="current_location"
+                   default="{current_location}"/>
+      <input_port name="target_frame"
+                  default="map"/>
+      <input_port name="source_frame"
+                  default="base_link"/>
+      <input_port name="odometry_topic"
+                  default=""
+                  description="Odometry topic as fallback when TF is not available (e.g., '/red_standard_robot1/odometry')"/>
+    </Action>
+    <Action ID="PursueEnemy"
+            editable="true">
+      <input_port name="armors"
+                  default="{armors}"/>
+      <input_port name="current_location"
+                  default="{current_location}"/>
+      <input_port name="pursue_radius"
+                  default="2.0"
+                  description="Distance to maintain from enemy (meters)"/>
+      <input_port name="update_interval"
+                  default="0.5"
+                  description="Interval to update pursue goal (seconds), 0 means update every tick"/>
+      <input_port name="action_name"
+                  default="navigate_to_pose"
+                  description="Navigation action server name"/>
+      <input_port name="target_frame"
+                  default="map"
+                  description="Target frame for navigation (map or odom)"/>
+      <input_port name="robot_base_frame"
+                  default="base_link"
+                  description="Robot base frame"/>
+    </Action>
+  </TreeNodesModel>
+
+</root>
+

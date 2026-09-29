@@ -1,0 +1,2 @@
+uint8 game_progress 
+uint16 game_progress_remain

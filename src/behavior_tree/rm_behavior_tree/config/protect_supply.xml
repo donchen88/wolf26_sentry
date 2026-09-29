@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4"
+      main_tree_to_execute="BehaviorTree">
+  <BehaviorTree ID="BehaviorTree">
+    <ReactiveSequence>
+      <SubAllRobotHP topic_name="robot_hp"
+                     robot_hp="{robot_hp}"/>
+      <SubArmors topic_name="/detector/armors"
+                 armors="{armors}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <WhileDoElse>
+        <IsGameTime name="IsGameStart"
+                    message="{game_status}"
+                    game_progress="4"
+                    lower_remain_time="0"
+                    higher_remain_time="300"/>
+        <ReactiveSequence>
+          <WhileDoElse name="Whether gimbal_scan/chassis_spin">
+            <IsDetectEnemy message="{armors}"/>
+            <RobotControl stop_gimbal_scan="True"
+                          chassis_spin_vel="0.5"/>
+            <RobotControl stop_gimbal_scan="False"
+                          chassis_spin_vel="0.5"/>
+          </WhileDoElse>
+          <WhileDoElse>
+            <Sequence>
+              <IsDetectEnemy message="{armors}"/>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="400"
+                          heat_threshold="350"/>
+            </Sequence>
+            <WhileDoElse>
+              <IsAttaked message="{robot_status}"/>
+              <AsyncSequence>
+                <GetCurrentLocation current_location="{current_location}"/>
+                <MoveAround expected_nearby_goal_count="3"
+                            expected_dis="0.3"
+                            message="{current_location}"/>
+              </AsyncSequence>
+              <Fallback name="Whether interrupt navigation">
+                <IsStatusOK message="{robot_status}"
+                            hp_threshold="250"
+                            heat_threshold="350"/>
+                <SendGoal name="SupplyArea"
+                          goal_pose="-2.5;4.07;0; 0;0;0;1"
+                          action_name="navigate_to_pose"/>
+              </Fallback>
+            </WhileDoElse>
+            <WhileDoElse>
+              <IsStatusOK message="{robot_status}"
+                          hp_threshold="400"
+                          heat_threshold="350"/>
+              <WhileDoElse>
+                <IsAttaked message="{robot_status}"/>
+                <AsyncSequence name="Dodge">
+                  <GetCurrentLocation current_location="{current_location}"/>
+                  <MoveAround expected_nearby_goal_count="3"
+                              expected_dis="0.3"
+                              message="{current_location}"/>
+                </AsyncSequence>
+                <WhileDoElse>
+                  <IsGameTime name="4:30-5:00"
+                              message="{game_status}"
+                              game_progress="4"
+                              lower_remain_time="250"
+                              higher_remain_time="300"/>
+                  <RateController hz="1">
+                    <SendGoal name="ProtectSupply"
+                              goal_pose="-1.1;3.4;0; 0;0;0;1"
+                              action_name="navigate_to_pose"/>
+                  </RateController>
+                  <WhileDoElse>
+                    <Sequence>
+                      <IsGameTime name="3:20-4:05"
+                                  message="{game_status}"
+                                  game_progress="4"
+                                  lower_remain_time="200"
+                                  higher_remain_time="245"/>
+                      <IsFriendOK message="{robot_hp}"
+                                  friend_color="red"/>
+                    </Sequence>
+                    <SendGoal name="OccupyCenter"
+                              goal_pose="3.0;0.4;0; 0;0;0;1"
+                              action_name="navigate_to_pose"/>
+                    <SendGoal name="BaseLeft"
+                              goal_pose="-2.2;0.3;0; 0;0;0;1"
+                              action_name="navigate_to_pose"/>
+                  </WhileDoElse>
+                </WhileDoElse>
+              </WhileDoElse>
+              <RateController name="Retreat"
+                              hz="1">
+                <SendGoal name="SupplyArea"
+                          goal_pose="-2.5;4.07;0; 0;0;0;1"
+                          action_name="navigate_to_pose"/>
+              </RateController>
+            </WhileDoElse>
+          </WhileDoElse>
+        </ReactiveSequence>
+        <ReactiveSequence>
+          <RateController hz="1">
+            <SendGoal name="Home"
+                      goal_pose="0;0;0; 0;0;0;1"
+                      action_name="navigate_to_pose"/>
+          </RateController>
+          <RobotControl stop_gimbal_scan="True"
+                        chassis_spin_vel="0.0"/>
+        </ReactiveSequence>
+      </WhileDoElse>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="GetCurrentLocation"
+            editable="true">
+      <output_port name="current_location"
+                   default="{current_location}"/>
+    </Action>
+    <Action ID="IsAttaked"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_status}"/>
+    </Action>
+    <Action ID="IsDetectEnemy"
+            editable="true">
+      <input_port name="message"
+                  default="{armors}"/>
+    </Action>
+    <Action ID="IsFriendOK"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_hp}"/>
+      <input_port name="friend_color"
+                  default="red"/>
+    </Action>
+    <Action ID="IsGameTime"
+            editable="true">
+      <input_port name="message"
+                  default="{game_status}"/>
+      <input_port name="game_progress"
+                  default="4"/>
+      <input_port name="lower_remain_time"
+                  default="0"/>
+      <input_port name="higher_remain_time"
+                  default="300"/>
+    </Action>
+    <Action ID="IsStatusOK"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_status}"/>
+      <input_port name="hp_threshold"
+                  default="100"/>
+      <input_port name="heat_threshold"
+                  default="350"/>
+    </Action>
+    <Action ID="MoveAround"
+            editable="true">
+      <input_port name="expected_nearby_goal_count"
+                  default="5"/>
+      <input_port name="expected_dis"
+                  default="0.3"/>
+      <input_port name="message"
+                  default="{current_location}"/>
+    </Action>
+    <Decorator ID="RateController">
+      <input_port name="hz">Rate</input_port>
+    </Decorator>
+    <Action ID="RobotControl"
+            editable="true">
+      <input_port name="stop_gimbal_scan"
+                  default="True"/>
+      <input_port name="chassis_spin_vel"
+                  default="False"/>
+    </Action>
+    <Action ID="SendGoal"
+            editable="true">
+      <input_port name="goal_pose"
+                  default="0;0;0; 0;0;0;1"/>
+      <input_port name="action_name"
+                  default="navigate_to_pose"/>
+    </Action>
+    <Action ID="SubAllRobotHP"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_hp"/>
+      <output_port name="robot_hp"
+                   default="{robot_hp}"/>
+    </Action>
+    <Action ID="SubArmors"
+            editable="true">
+      <input_port name="topic_name"
+                  default="/detector/armors"/>
+      <output_port name="armors"
+                   default="{armors}"/>
+    </Action>
+    <Action ID="SubGameStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="game_status"/>
+      <output_port name="game_status"
+                   default="{game_status}"/>
+    </Action>
+    <Action ID="SubRobotStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_status"/>
+      <output_port name="robot_status"
+                   default="{robot_status}"/>
+    </Action>
+  </TreeNodesModel>
+
+</root>

@@ -1,0 +1,1 @@
+uint16 bullet_remain

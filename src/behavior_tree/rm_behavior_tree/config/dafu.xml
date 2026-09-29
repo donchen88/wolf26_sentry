@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root BTCPP_format="4">
+  <BehaviorTree ID="dafu">
+    <ReactiveSequence>
+      <SubGameStatus topic_name="game_status"
+                     game_status="{game_status}"/>
+      <SubArmors topic_name="/detector/armors"
+                 armors="{armors}"/>
+      <SubRobotStatus topic_name="robot_status"
+                      robot_status="{robot_status}"/>
+      <Sequence>
+        <WhileDoElse>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="360"
+                      higher_remain_time="420"/>
+          <WhileDoElse>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="100"
+                        heat_threshold="350"/>
+            <ReactiveSequence>
+              <GetCurrentLocation current_location="{current_location}"/>
+              <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                        action_name="navigate_to_pose"/>
+            </ReactiveSequence>
+          </WhileDoElse>
+          <SubTree ID="chack status and run"
+                   _autoremap="true"/>
+        </WhileDoElse>
+        <WhileDoElse>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="270"
+                      higher_remain_time="330"/>
+          <WhileDoElse>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="100"
+                        heat_threshold="350"/>
+            <ReactiveSequence>
+              <GetCurrentLocation current_location="{current_location}"/>
+              <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                        action_name="navigate_to_pose"/>
+            </ReactiveSequence>
+            <SubTree ID="chack status and run"
+                     _autoremap="true"/>
+          </WhileDoElse>
+        </WhileDoElse>
+        <WhileDoElse>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="180"
+                      higher_remain_time="240"/>
+          <WhileDoElse>
+            <IsStatusOK message="{robot_status}"
+                        hp_threshold="100"
+                        heat_threshold="350"/>
+            <ReactiveSequence>
+              <GetCurrentLocation current_location="{current_location}"/>
+              <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                        action_name="navigate_to_pose"/>
+            </ReactiveSequence>
+            <SubTree ID="chack status and run"
+                     _autoremap="true"/>
+          </WhileDoElse>
+        </WhileDoElse>
+        <WhileDoElse>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="105"
+                      higher_remain_time="165"/>
+          <ReactiveSequence>
+            <GetCurrentLocation current_location="{current_location}"/>
+            <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                      action_name="navigate_to_pose"/>
+          </ReactiveSequence>
+          <SubTree ID="chack status and run"
+                   _autoremap="true"/>
+        </WhileDoElse>
+        <WhileDoElse>
+          <IsGameTime message="{game_status}"
+                      game_progress="4"
+                      lower_remain_time="30"
+                      higher_remain_time="90"/>
+          <ReactiveSequence>
+            <GetCurrentLocation current_location="{current_location}"/>
+            <SendGoal goal_pose="0;0;0; 0;0;0;1"
+                      action_name="navigate_to_pose"/>
+          </ReactiveSequence>
+          <SubTree ID="chack status and run"
+                   _autoremap="true"/>
+        </WhileDoElse>
+      </Sequence>
+    </ReactiveSequence>
+  </BehaviorTree>
+
+  <!-- Description of Node Models (used by Groot) -->
+  <TreeNodesModel>
+    <Action ID="GetCurrentLocation"
+            editable="true">
+      <output_port name="current_location"
+                   default="{current_location}"/>
+    </Action>
+    <Action ID="IsGameTime"
+            editable="true">
+      <input_port name="message"
+                  default="{game_status}"/>
+      <input_port name="game_progress"
+                  default="4"/>
+      <input_port name="lower_remain_time"
+                  default="0"/>
+      <input_port name="higher_remain_time"
+                  default="300"/>
+    </Action>
+    <Action ID="IsStatusOK"
+            editable="true">
+      <input_port name="message"
+                  default="{robot_status}"/>
+      <input_port name="hp_threshold"
+                  default="100"/>
+      <input_port name="heat_threshold"
+                  default="350"/>
+    </Action>
+    <Action ID="SendGoal"
+            editable="true">
+      <input_port name="goal_pose"
+                  default="0;0;0; 0;0;0;1"/>
+      <input_port name="action_name"
+                  default="navigate_to_pose"/>
+    </Action>
+    <Action ID="SubArmors"
+            editable="true">
+      <input_port name="topic_name"
+                  default="/detector/armors"/>
+      <output_port name="armors"
+                   default="{armors}"/>
+    </Action>
+    <Action ID="SubGameStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="game_status"/>
+      <output_port name="game_status"
+                   default="{game_status}"/>
+    </Action>
+    <Action ID="SubRobotStatus"
+            editable="true">
+      <input_port name="topic_name"
+                  default="robot_status"/>
+      <output_port name="robot_status"
+                   default="{robot_status}"/>
+    </Action>
+  </TreeNodesModel>
+
+</root>

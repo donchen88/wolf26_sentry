@@ -1,0 +1,30 @@
+/lidar_align_tool:
+  ros__parameters:
+
+    # ---------- 输入话题 ----------
+    # 直接订阅这两个 Livox 的话题；如有差异可在 launch 中 remap
+    # (留空，由 launch 注入 / remap)
+
+    # ---------- 坐标系 ----------
+    frame_target:  "camera_init"     # 统一的基准坐标系
+    frame_lidar1:  "livox_frame1"
+    frame_lidar2:  "livox_frame2"
+
+    # ---------- Lidar1 → camera_init 外参 ----------
+    roll1:  0.0
+    pitch1: 0.0
+    yaw1:   0.0
+    tx1:    0.2310
+    ty1:    0.0
+    tz1:    0.2867
+
+    # ---------- Lidar2 → camera_init 外参 ----------
+    roll2:  6.36
+    pitch2: 77.69
+    yaw2:   -175.31
+    tx2:    -0.1901
+    ty2:    0.0
+    tz2:    0.1360
+
+    # ---------- 同步 ----------
+    max_time_diff_ms: 50

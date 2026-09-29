@@ -1,0 +1,19 @@
+name: pre-commit
+
+# 只跑静态卫生检查。
+# 刻意不使用 ros-tooling/action-ros-ci：本工作区依赖 Livox SDK2 二进制
+# （livox_ros_driver2）与 openvdb，在 GitHub runner 上必然编译失败。
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: pre-commit/action@v3.0.1

@@ -1,0 +1,37 @@
+# ---- 构建产物 ----
+build/
+install/
+log/
+devel/
+.compile_commands/
+compile_commands.json
+
+# ---- ROS ----
+__pycache__/
+*.py[cod]
+COLCON_IGNORE
+
+# ---- 编辑器 ----
+.vscode/
+.idea/
+.cache/
+*.kdev4
+
+# ---- 先验点云地图：6.3GB，绝不入库 ----
+# 放置方法见 src/bringup/wolf26_nav_bringup/pcd/README.md
+# 注意：git 的路径匹配区分大小写，point_lio 用的是大写 PCD/，
+# 因此必须分两条写，不能只写小写 pcd。
+src/bringup/wolf26_nav_bringup/pcd/**/*.pcd
+src/bringup/wolf26_nav_bringup/pcd/*.pcd
+# point_lio 运行时保存建图结果的目录（上游只跟踪其中的 readme.md，
+# 该 readme 明确要求保留此目录，故只忽略 .pcd 而保留 readme.md）
+**/PCD/*.pcd
+**/pcd/*.pcd
+
+# ---- 压缩包 / 临时产物 ----
+*.zip
+*.tar.gz
+*~
+*.gv
+*.pdf
+*.btproj.bak
