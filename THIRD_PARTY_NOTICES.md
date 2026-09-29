@@ -12,12 +12,11 @@
 
 | 目录 | 上游项目 | 许可证 | 基线 commit |
 |---|---|---|---|
-| `src/localization/point_lio` | [SMBU-PolarBear-Robotics-Team/point_lio](https://github.com/SMBU-PolarBear-Robotics-Team/point_lio) | **BSD-3-Clause**，但 `include/IKFoM/` 为 **GPL-2.0**（见 §4） | `641424b` (2024-12-25) |
+| `src/localization/point_lio` | [SMBU-PolarBear-Robotics-Team/point_lio](https://github.com/SMBU-PolarBear-Robotics-Team/point_lio) | **BSD-3-Clause**，但 `include/IKFoM/` 为 **GPL-2.0**（见 §3） | `641424b` (2024-12-25) |
 | `src/localization/small_gicp_relocalization` | [SMBU-PolarBear-Robotics-Team/small_gicp_relocalization](https://github.com/SMBU-PolarBear-Robotics-Team/small_gicp_relocalization) | Apache-2.0 | `4b9d31d` (2025-02-28) |
 | `src/perception/terrain_analysis` | [SMBU-PolarBear-Robotics-Team/terrain_analysis](https://github.com/SMBU-PolarBear-Robotics-Team/terrain_analysis) | Apache-2.0 | `c82f23c` (2025-02-15) |
 | `src/perception/pointcloud_to_laserscan` | [SMBU-PolarBear-Robotics-Team/pointcloud_to_laserscan](https://github.com/SMBU-PolarBear-Robotics-Team/pointcloud_to_laserscan)（`ros-perception/pointcloud_to_laserscan` 的 fork） | BSD-3-Clause（Willow Garage / Eurotec） | `5efaa8b` (2025-02-24) |
 | `src/navigation/pb_omni_pid_pursuit_controller` | [SMBU-PolarBear-Robotics-Team/pb_omni_pid_pursuit_controller](https://github.com/SMBU-PolarBear-Robotics-Team/pb_omni_pid_pursuit_controller) | Apache-2.0 | `9901878` (2025-03-10) |
-| `src/navigation/pb_teleop_twist_joy` | [SMBU-PolarBear-Robotics-Team/pb_teleop_twist_joy](https://github.com/SMBU-PolarBear-Robotics-Team/pb_teleop_twist_joy) | Apache-2.0 | `f64d63a` (2025-02-08) |
 | `src/interfaces/auto_aim_interfaces` | [SMBU-PolarBear-Robotics-Team/auto_aim_interfaces](https://github.com/SMBU-PolarBear-Robotics-Team/auto_aim_interfaces) | MIT | `5eab0e0` (2025-02-06) |
 
 以下包来自 **`pb2025_sentry_nav` 单体仓库**（作者 Lihan Chen，
@@ -31,34 +30,22 @@
 | `src/navigation/behavior_ext_plugins` | Apache-2.0 | |
 | `src/localization/loam_interface` | Apache-2.0 | |
 | `src/localization/sensor_scan_generation` | Apache-2.0 | |
-| `src/perception/ign_sim_pointcloud_tool` | Apache-2.0 | |
 
 ---
 
-## 2. 来自 SMBU-POLARBEAR（Gitee）
-
-| 目录 | 上游项目 | 许可证 | 基线 commit |
-|---|---|---|---|
-| `src/behavior_tree/rm_behavior_tree` | [gitee.com/SMBU-POLARBEAR/rm_behavior_tree](https://gitee.com/SMBU-POLARBEAR/rm_behavior_tree) | MIT | `2e39c2b` (2024-06-17) |
-| `src/interfaces/rm_decision_interfaces` | 同上仓库 | MIT | `2e39c2b` (2024-06-17) |
-| `src/behavior_tree/BehaviorTree.ROS2/behaviortree_ros2` | 经上述仓库内联，原始项目 [BehaviorTree/BehaviorTree.ROS2](https://github.com/BehaviorTree/BehaviorTree.ROS2)（Davide Faconti） | MIT | `2e39c2b` (2024-06-17) |
-| `src/behavior_tree/BehaviorTree.ROS2/btcpp_ros2_interfaces` | 同上 | MIT | `2e39c2b` (2024-06-17) |
-
----
-
-## 3. 其它上游
+## 2. 其它上游
 
 | 目录 | 上游项目 | 作者 | 许可证 | 基线 commit |
 |---|---|---|---|---|
-| `src/navigation/spatio_temporal_voxel_layer` | [SteveMacenski/spatio_temporal_voxel_layer](https://github.com/SteveMacenski/spatio_temporal_voxel_layer) | Steve Macenski | **LGPL v2.1**（见 §4） | `92896fe` (2025-04-15) |
+| `src/navigation/spatio_temporal_voxel_layer` | [SteveMacenski/spatio_temporal_voxel_layer](https://github.com/SteveMacenski/spatio_temporal_voxel_layer) | Steve Macenski | **LGPL v2.1**（见 §3） | `92896fe` (2025-04-15) |
 | `src/perception/livox_ros_driver2` | [Livox-SDK/livox_ros_driver2](https://github.com/Livox-SDK/livox_ros_driver2) | Livox | MIT（`LICENSE.txt`；`3rdparty/rapidjson` 见其自带许可） | `6b9356c` (2024-09-11) |
-| `src/interfaces/roborts_msgs` | [RoboMaster/RoboRTS](https://github.com/RoboMaster/RoboRTS) | RoboMaster / DJI | **GPL-3.0**（见 §4） | — |
+| `src/interfaces/roborts_msgs` | [RoboMaster/RoboRTS](https://github.com/RoboMaster/RoboRTS) | RoboMaster / DJI | **GPL-3.0**（见 §3） | — |
 
 ---
 
-## 4. 需要特别注意的许可证
+## 3. 需要特别注意的许可证
 
-### 4.1 `spatio_temporal_voxel_layer` — LGPL v2.1
+### 3.1 `spatio_temporal_voxel_layer` — LGPL v2.1
 
 本包采用 **LGPL v2.1**，比仓库其余部分更严格：
 
@@ -74,7 +61,7 @@
    **必须同时提供该包的完整源码或其获取方式**。
 4. 请勿将其静态链接进闭源产物。
 
-### 4.2 `point_lio` — 内含 GPL-2.0 且实际参与编译
+### 3.2 `point_lio` — 内含 GPL-2.0 且实际参与编译
 
 - `point_lio` 自身为 BSD-3-Clause。
 - 但其 `include/IKFoM/`（IMU 误差状态卡尔曼滤波工具包）为 **GPL-2.0**
@@ -84,7 +71,7 @@
   话题通信、各自独立成进程，属于 GPL-2.0 与 Apache-2.0 在同一仓库共存的常见安排；
   但**不能在发布时声称“整个仓库都是 Apache-2.0”**。
 
-### 4.3 `roborts_msgs` — GPL-3.0
+### 3.3 `roborts_msgs` — GPL-3.0
 
 - `package.xml` 声明 `<license>GPL 3.0</license>`，来自 RoboMaster/RoboRTS。
 - **该包未附带 LICENSE 文件**（上游即如此），此处按 `package.xml` 的声明记录。
@@ -92,7 +79,7 @@
 
 ---
 
-## 5. 本团队自有包
+## 4. 本团队自有包
 
 以下包由本队维护，非上述上游项目，但目前 `package.xml` 中的许可证声明为
 自动生成时留下的占位符 `TODO: License declaration`，**尚未正式确定**：
@@ -109,16 +96,23 @@
 |---|---|---|
 | `src/navigation/pb_nav2_plugins` | `donchen88/wolf_sentry`（本队 fork，`08fe22c` 2026-03-29） | Apache-2.0 |
 | `src/driver/rm_serial_driver_nav2` | 本队 `wildwolf_serial_nav2` | MIT |
-| `src/interfaces/roborts_msgs` 之外的 `robot_msgs` | 本队 `wildwolf_serial_nav2` | 见上（TODO） |
+| `src/interfaces/robot_msgs` | 本队 `wildwolf_serial_nav2` | 见上（TODO） |
 | `src/interfaces/sp_msgs` | 本队（与自瞄共享的契约） | MIT |
-| `src/navigation/costmap_intensity` | 本队（在研，未启用） | BSD-3-Clause / Apache-2.0 双许可 |
 | `src/perception/merge_cloud` | 本队 | 见上（TODO） |
 | `src/perception/lidar_align_tool` | 本队 | 见上（TODO） |
 
+> `src/interfaces/sp_msgs` 与 `src/interfaces/auto_aim_interfaces` 目前在本仓库内
+> **没有消费者**（原先的使用者 `rm_behavior_tree` 已移除），保留原因是它们属于
+> 对端（自瞄 / 视觉）的线缆契约。
+
 ---
 
-## 6. 上游文档
+## 5. 上游文档
 
 `src/bringup/wolf26_nav_bringup/docs/upstream/` 下保留了上游 `pb2025_sentry_nav`
 仓库的 `README.md`、`README_en.md`、`CONTRIBUTING.md`，作为署名与历史记录。
 其中提到的包名已同步更新为本仓库的 `wolf26_nav_bringup`。
+
+**注意**：这些上游文档的目录树仍列有 `pb_teleop_twist_joy`、`rm_behavior_tree` 等
+本仓库已移除的包，以及 `gazebo_simulator`（从未纳入本仓库）。它们是上游原貌的存档，
+**不代表本仓库的实际内容**；实际内容以根目录 [README.md](README.md) 为准。

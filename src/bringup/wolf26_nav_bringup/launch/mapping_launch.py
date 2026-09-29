@@ -198,15 +198,6 @@ def generate_launch_description():
         }.items(),
     )
 
-    joy_teleop_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(launch_dir, "joy_teleop_launch.py")),
-        launch_arguments={
-            "namespace": namespace,
-            "use_sim_time": use_sim_time,
-            "joy_config_file": params_file,
-        }.items(),
-    )
-
     # RM Serial Driver Node
     rm_serial_driver_node = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([get_package_share_directory('rm_serial_driver_nav2'), '/launch/robot_serial_driver.launch.py'])
@@ -237,7 +228,6 @@ def generate_launch_description():
     # ld.add_action(start_livox_ros_driver2_node)
     # ld.add_action(merge_cloud_cmd)
     ld.add_action(bringup_cmd)
-    ld.add_action(joy_teleop_cmd)
     ld.add_action(rviz_cmd)
     ld.add_action(rm_serial_driver_node)
 
