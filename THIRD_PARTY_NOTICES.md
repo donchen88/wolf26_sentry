@@ -18,6 +18,8 @@
 | `src/perception/pointcloud_to_laserscan` | [SMBU-PolarBear-Robotics-Team/pointcloud_to_laserscan](https://github.com/SMBU-PolarBear-Robotics-Team/pointcloud_to_laserscan)（`ros-perception/pointcloud_to_laserscan` 的 fork） | BSD-3-Clause（Willow Garage / Eurotec） | `5efaa8b` (2025-02-24) |
 | `src/navigation/pb_omni_pid_pursuit_controller` | [SMBU-PolarBear-Robotics-Team/pb_omni_pid_pursuit_controller](https://github.com/SMBU-PolarBear-Robotics-Team/pb_omni_pid_pursuit_controller) | Apache-2.0 | `9901878` (2025-03-10) |
 | `src/interfaces/auto_aim_interfaces` | [SMBU-PolarBear-Robotics-Team/auto_aim_interfaces](https://github.com/SMBU-PolarBear-Robotics-Team/auto_aim_interfaces) | MIT | `5eab0e0` (2025-02-06) |
+| `src/description/pb2025_robot_description` | [SMBU-PolarBear-Robotics-Team/pb2025_robot_description](https://github.com/SMBU-PolarBear-Robotics-Team/pb2025_robot_description) | MIT（`package.xml` 声明；**上游未附 LICENSE 文件**） | `0832710` (2025-02-21) |
+| `src/description/rmoss_gz_resources` | [SMBU-PolarBear-Robotics-Team/rmoss_gz_resources](https://github.com/SMBU-PolarBear-Robotics-Team/rmoss_gz_resources)（`robomaster-oss/rmoss_gazebo` 的 fork） | Apache-2.0 | `e7d0adf` (2024-12-21) |
 
 以下包来自 **`pb2025_sentry_nav` 单体仓库**（作者 Lihan Chen，
 [SMBU-PolarBear-Robotics-Team](https://github.com/SMBU-PolarBear-Robotics-Team)），
@@ -40,6 +42,7 @@
 | `src/navigation/spatio_temporal_voxel_layer` | [SteveMacenski/spatio_temporal_voxel_layer](https://github.com/SteveMacenski/spatio_temporal_voxel_layer) | Steve Macenski | **LGPL v2.1**（见 §3） | `92896fe` (2025-04-15) |
 | `src/perception/livox_ros_driver2` | [Livox-SDK/livox_ros_driver2](https://github.com/Livox-SDK/livox_ros_driver2) | Livox | MIT（`LICENSE.txt`；`3rdparty/rapidjson` 见其自带许可） | `6b9356c` (2024-09-11) |
 | `src/interfaces/roborts_msgs` | [RoboMaster/RoboRTS](https://github.com/RoboMaster/RoboRTS) | RoboMaster / DJI | **GPL-3.0**（见 §3） | — |
+| `src/description/sdformat_tools` | [gezp/sdformat_tools](https://github.com/gezp/sdformat_tools) | gezp | Apache-2.0 | `47c2d1a` (2023-07-06) |
 
 ---
 
@@ -94,7 +97,7 @@
 
 | 目录 | 来源 | 许可证 |
 |---|---|---|
-| `src/navigation/pb_nav2_plugins` | `donchen88/wolf_sentry`（本队 fork，`08fe22c` 2026-03-29） | Apache-2.0 |
+| `src/navigation/nav2_plugins` | `donchen88/wolf_sentry`（本队 fork，`08fe22c` 2026-03-29）；上游为 SMBU-PolarBear 的 `pb_nav2_plugins`，本仓库改名为 `nav2_plugins`，插件类命名空间一并由 `pb_nav2_costmap_2d` / `pb_nav2_behaviors` / `escape_bias_layer` 统一为 `nav2_plugins`；库目标 `layers` 改名为 `nav2_plugins_layers`（原名与 Nav2 自带的 `liblayers.so` 同 SONAME，会让本包在只用自己的层时 dlopen 失败） | Apache-2.0 |
 | `src/driver/rm_serial_driver_nav2` | 本队 `wildwolf_serial_nav2` | MIT |
 | `src/interfaces/robot_msgs` | 本队 `wildwolf_serial_nav2` | 见上（TODO） |
 | `src/interfaces/sp_msgs` | 本队（与自瞄共享的契约） | MIT |

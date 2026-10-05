@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<library path="pb_bt_nodes">
+  <class
+    name="nav2_plugins/ComputePathToPoseWithEdgeWaypoint"
+    type="nav2_plugins::ComputePathToPoseWithEdgeWaypoint"
+    base_class_type="nav2_behavior_tree::BtActionNode">
+    <description>
+      ComputePathToPose with edge waypoint fallback for out-of-map goals.
+    </description>
+  </class>
+
+</library>
+
+<library path="pb_back_up_frees_space_behavior">
+  <class
+    name="nav2_plugins/BackUpFreeSpace"
+    type="nav2_plugins::BackUpFreeSpace"
+    base_class_type="nav2_core::Behavior">
+    <description>
+      An enhanced back_up action that move toward free space.
+    </description>
+  </class>
+</library>

@@ -13,6 +13,12 @@ find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+# 可执行脚本：launch 里用 Node(package=..., executable=...) 直接拉起
+install(PROGRAMS
+  scripts/periodic_map_saver.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_auto_package(
   INSTALL_TO_SHARE
   launch

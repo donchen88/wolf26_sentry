@@ -164,7 +164,12 @@ def generate_launch_description():
 
 
     load_nodes = GroupAction(
-        condition=IfCondition(PythonExpression(["not ", use_composition])),
+        # 不能写成 PythonExpression(["not ", use_composition])：替换进去的是裸 token，
+        # `use_composition:=false` 会拼成 `not false`，而 Python 里 `false` 是未定义的名字，
+        # launch 会直接抛 NameError 退出。加引号 + 小写化比较后，true/True/false/False 都能用。
+        condition=IfCondition(
+            PythonExpression(["'", use_composition, "'.lower() != 'true'"])
+        ),
         actions=[
             Node(
                 package="loam_interface",

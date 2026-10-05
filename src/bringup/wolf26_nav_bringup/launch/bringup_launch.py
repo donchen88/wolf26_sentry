@@ -52,11 +52,28 @@ def generate_launch_description():
     log_level = LaunchConfiguration("log_level")
     slowdown_map = LaunchConfiguration("slowdown_map")
     use_slowdown_zone = LaunchConfiguration("use_slowdown_zone")
+    relocate = LaunchConfiguration("relocate")
+    use_map_save = LaunchConfiguration("use_map_save")
+    map_save_path = LaunchConfiguration("map_save_path")
+    map_save_interval = LaunchConfiguration("map_save_interval")
 
     # In SLAM mapping mode the slowdown zone is never used, so the effective
     # value is forced to false regardless of what the user requested.
     use_slowdown_zone_effective = PythonExpression(
         ["'false' if '", slam, "'.lower() == 'true' else '", use_slowdown_zone, "'"]
+    )
+
+    # In SLAM mapping mode slam_launch.py already brings up map_saver_server and
+    # its lifecycle manager; outside it nobody would, so periodic saving needs
+    # its own map_saver chain.
+    map_saver_standalone = PythonExpression(
+        [
+            "'",
+            use_map_save,
+            "'.lower() == 'true' and '",
+            slam,
+            "'.lower() != 'true'",
+        ]
     )
 
     # Create our own temporary YAML files that include substitutions
@@ -134,6 +151,37 @@ def generate_launch_description():
         description="Whether to use the slowdown zone feature (always disabled in SLAM mapping mode)",
     )
 
+    declare_relocate_cmd = DeclareLaunchArgument(
+        "relocate",
+        default_value="true",
+        description=(
+            "Whether to launch small_gicp_relocalization. Set false when the "
+            "map->odom transform is supplied from elsewhere, e.g. replaying a "
+            "rosbag that already carries the full TF tree."
+        ),
+    )
+
+    declare_use_map_save_cmd = DeclareLaunchArgument(
+        "use_map_save",
+        default_value="false",
+        description="Whether to periodically save the map while the stack runs",
+    )
+
+    declare_map_save_path_cmd = DeclareLaunchArgument(
+        "map_save_path",
+        default_value="~/sentry26_maps/map",
+        description=(
+            "Output prefix for the periodic map save (no extension): "
+            "<map_save_path>.pgm and <map_save_path>.yaml are overwritten each round"
+        ),
+    )
+
+    declare_map_save_interval_cmd = DeclareLaunchArgument(
+        "map_save_interval",
+        default_value="60.0",
+        description="Seconds between two periodic map saves",
+    )
+
     declare_autostart_cmd = DeclareLaunchArgument(
         "autostart",
         default_value="true",
@@ -188,7 +236,12 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource(
                     os.path.join(launch_dir, "localization_launch.py")
                 ),
-                condition=IfCondition(PythonExpression(["not ", slam])),
+                # 同上：裸 token 会拼成 `not false` → NameError。本文件自己声明的 slam
+                # 默认是 "False"（能侥幸跑通），但上层 nav_launch.py 传进来的
+                # mapping_mode 默认是小写 "false"，就会炸。
+                condition=IfCondition(
+                    PythonExpression(["'", slam, "'.lower() != 'true'"])
+                ),
                 launch_arguments={
                     "namespace": namespace,
                     "map": map_yaml_file,
@@ -196,6 +249,7 @@ def generate_launch_description():
                     "autostart": autostart,
                     "params_file": params_file,
                     "prior_pcd_file": prior_pcd_file,
+                    "relocate": relocate,
                     "use_composition": use_composition,
                     "use_respawn": use_respawn,
                     "container_name": "nav2_container",
@@ -220,6 +274,55 @@ def generate_launch_description():
         ]
     )
 
+    # ── 周期存图 ──────────────────────────────────────────────────────────
+    # nav2 的 map_saver_server 在 C++ 里把节点名硬编码成 "map_saver"（与 yaml 里的
+    # `map_saver:` 参数段、lifecycle 的 node_names 对齐），这里显式写出来避免歧义。
+    # 它是一个 lifecycle 节点，save_map 服务要等 lifecycle manager 把它 activate
+    # 之后才存在，所以下面必须连着 map_saver_server + lifecycle manager 一起起。
+    start_map_saver_server_cmd = Node(
+        package="nav2_map_server",
+        executable="map_saver_server",
+        name="map_saver",
+        namespace=namespace,
+        output="screen",
+        respawn=use_respawn,
+        respawn_delay=2.0,
+        parameters=[configured_params],
+        arguments=["--ros-args", "--log-level", log_level],
+        condition=IfCondition(map_saver_standalone),
+    )
+
+    start_map_saver_lifecycle_manager_cmd = Node(
+        package="nav2_lifecycle_manager",
+        executable="lifecycle_manager",
+        name="lifecycle_manager_map_saver",
+        namespace=namespace,
+        output="screen",
+        arguments=["--ros-args", "--log-level", log_level],
+        parameters=[
+            {"use_sim_time": use_sim_time},
+            {"autostart": autostart},
+            {"node_names": ["map_saver"]},
+        ],
+        condition=IfCondition(map_saver_standalone),
+    )
+
+    start_periodic_map_saver_cmd = Node(
+        package="wolf26_nav_bringup",
+        executable="periodic_map_saver.py",
+        name="periodic_map_saver",
+        namespace=namespace,
+        output="screen",
+        parameters=[
+            {
+                "use_sim_time": use_sim_time,
+                "map_save_path": map_save_path,
+                "save_interval": map_save_interval,
+            }
+        ],
+        condition=IfCondition(use_map_save),
+    )
+
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -236,6 +339,10 @@ def generate_launch_description():
     ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_slowdown_map_cmd)
     ld.add_action(declare_use_slowdown_zone_cmd)
+    ld.add_action(declare_relocate_cmd)
+    ld.add_action(declare_use_map_save_cmd)
+    ld.add_action(declare_map_save_path_cmd)
+    ld.add_action(declare_map_save_interval_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_use_composition_cmd)
     ld.add_action(declare_use_respawn_cmd)
@@ -243,5 +350,10 @@ def generate_launch_description():
 
     # Add the actions to launch all of the navigation nodes
     ld.add_action(bringup_cmd_group)
+
+    # 周期存图（独立于 nav2 组合容器，map_saver 本来就是独立 lifecycle 节点）
+    ld.add_action(start_map_saver_server_cmd)
+    ld.add_action(start_map_saver_lifecycle_manager_cmd)
+    ld.add_action(start_periodic_map_saver_cmd)
 
     return ld

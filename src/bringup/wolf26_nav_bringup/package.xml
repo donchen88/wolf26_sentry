@@ -18,7 +18,17 @@
   <exec_depend>navigation2</exec_depend>
   <exec_depend>nav2_common</exec_depend>
   <exec_depend>nav2_smac_planner</exec_depend>
-  <exec_depend>pb_nav2_plugins</exec_depend>
+  <exec_depend>nav2_msgs</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <!-- 以下 7 个包被 launch/ 直接 Node(...) 或 include 起来，原先漏声明了 -->
+  <exec_depend>rclcpp_components</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>merge_cloud</exec_depend>
+  <exec_depend>rm_serial_driver_nav2</exec_depend>
+  <exec_depend>fake_vel_transform</exec_depend>
+  <exec_depend>loam_interface</exec_depend>
+  <exec_depend>sensor_scan_generation</exec_depend>
+  <exec_depend>nav2_plugins</exec_depend>
   <exec_depend>livox_ros_driver2</exec_depend>
   <exec_depend>point_lio</exec_depend>
   <exec_depend>terrain_analysis</exec_depend>
@@ -27,6 +37,9 @@
   <exec_depend>pointcloud_to_laserscan</exec_depend>
   <exec_depend>slam_toolbox</exec_depend>
   <exec_depend>rviz2</exec_depend>
+  <!-- use_robot_state_pub:=true 时 robot_state_publisher_launch.py 会 include
+       它（已 vendored 在 src/description/），供 RViz 显示机器人模型 -->
+  <exec_depend>pb2025_robot_description</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -35,6 +35,7 @@ def generate_launch_description():
     autostart = LaunchConfiguration("autostart")
     prior_pcd_file = LaunchConfiguration("prior_pcd_file")
     params_file = LaunchConfiguration("params_file")
+    relocate = LaunchConfiguration("relocate")
     use_composition = LaunchConfiguration("use_composition")
     container_name = LaunchConfiguration("container_name")
     container_name_full = (namespace, "/", container_name)
@@ -88,6 +89,16 @@ def generate_launch_description():
         description="Full path to the ROS2 parameters file to use for all launched nodes",
     )
 
+    declare_relocate_cmd = DeclareLaunchArgument(
+        "relocate",
+        default_value="true",
+        description=(
+            "Whether to launch small_gicp_relocalization. Set false when the "
+            "map->odom transform is supplied from elsewhere, e.g. replaying a "
+            "rosbag that already carries the full TF tree."
+        ),
+    )
+
     declare_autostart_cmd = DeclareLaunchArgument(
         "autostart",
         default_value="true",
@@ -131,7 +142,12 @@ def generate_launch_description():
     )
 
     load_nodes = GroupAction(
-        condition=IfCondition(PythonExpression(["not ", use_composition])),
+        # 不能写成 PythonExpression(["not ", use_composition])：替换进去的是裸 token，
+        # `use_composition:=false` 会拼成 `not false`，而 Python 里 `false` 是未定义的名字，
+        # launch 会直接抛 NameError 退出。加引号 + 小写化比较后，true/True/false/False 都能用。
+        condition=IfCondition(
+            PythonExpression(["'", use_composition, "'.lower() != 'true'"])
+        ),
         actions=[
             Node(
                 package="nav2_map_server",
@@ -141,16 +157,6 @@ def generate_launch_description():
                 respawn=use_respawn,
                 respawn_delay=2.0,
                 parameters=[configured_params],
-                arguments=["--ros-args", "--log-level", log_level],
-            ),
-            Node(
-                package="small_gicp_relocalization",
-                executable="small_gicp_relocalization_node",
-                name="small_gicp_relocalization",
-                output="screen",
-                respawn=use_respawn,
-                respawn_delay=2.0,
-                parameters=[configured_params, {"prior_pcd_file": prior_pcd_file}],
                 arguments=["--ros-args", "--log-level", log_level],
             ),
             Node(
@@ -179,12 +185,6 @@ def generate_launch_description():
                 parameters=[configured_params],
             ),
             ComposableNode(
-                package="small_gicp_relocalization",
-                plugin="small_gicp_relocalization::SmallGicpRelocalizationNode",
-                name="small_gicp_relocalization",
-                parameters=[configured_params, {"prior_pcd_file": prior_pcd_file}],
-            ),
-            ComposableNode(
                 package="nav2_lifecycle_manager",
                 plugin="nav2_lifecycle_manager::LifecycleManager",
                 name="lifecycle_manager_localization",
@@ -197,6 +197,30 @@ def generate_launch_description():
                 ],
             ),
         ],
+    )
+
+    # ── 重定位节点：永远独立进程，不进组合容器 ──────────────────────────────
+    # 这是实测踩出来的：只要 small_gicp 被 load 进 nav2_container，容器就不再回应
+    # /_container/load_node 服务——排在它后面的那一批（navigation_launch.py 的
+    # controller/planner/bt_navigator/…）会永远卡在等待服务响应上，一声不吭，
+    # 半个栈都起不来。
+    #
+    # 对照实验（同一份 launch，只改 relocate）：
+    #   relocate:=false → 23 个节点全部就位（control/plan/bt/costmap/…）
+    #   relocate:=true  → 只有 map_server + lifecycle_manager + small_gicp 三个，
+    #                     其余全部静默丢失
+    # 所以这里让它始终以独立进程运行，绕开容器。代价是多一个进程，
+    # 换来的是行为可预期——而且那 423 万点的先验地图也不用再塞进容器内存。
+    start_relocalization_node = Node(
+        package="small_gicp_relocalization",
+        executable="small_gicp_relocalization_node",
+        name="small_gicp_relocalization",
+        output="screen",
+        respawn=use_respawn,
+        respawn_delay=2.0,
+        parameters=[configured_params, {"prior_pcd_file": prior_pcd_file}],
+        arguments=["--ros-args", "--log-level", log_level],
+        condition=IfCondition(relocate),
     )
 
     # Create the launch description and populate
@@ -212,6 +236,7 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_prior_pcd_file_cmd)
     ld.add_action(declare_params_file_cmd)
+    ld.add_action(declare_relocate_cmd)
     ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_use_composition_cmd)
     ld.add_action(declare_container_name_cmd)
@@ -220,6 +245,7 @@ def generate_launch_description():
 
     # Add the actions to launch all of the localiztion nodes
     ld.add_action(start_point_lio_node)
+    ld.add_action(start_relocalization_node)
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
 

@@ -31,6 +31,7 @@ def generate_launch_description():
     # Create the launch configuration variables
     namespace = LaunchConfiguration("namespace")
     rviz_config_file = LaunchConfiguration("rviz_config")
+    use_sim_time = LaunchConfiguration("use_sim_time")
 
     # Declare the launch arguments
     declare_namespace_cmd = DeclareLaunchArgument(
@@ -44,8 +45,16 @@ def generate_launch_description():
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         "rviz_config",
-        default_value=os.path.join(bringup_dir, "rviz", "NAV.rviz"),
+        default_value=os.path.join(bringup_dir, "rviz", "nav2_default_view.rviz"),
         description="Full path to the RViz config file to use",
+    )
+
+    # 每个调用方（nav_launch.py 等）都在传 use_sim_time，原先这里没声明，
+    # 于是被静默丢弃、RViz 永远用墙上时钟。补上声明真正生效。
+    declare_use_sim_time_cmd = DeclareLaunchArgument(
+        "use_sim_time",
+        default_value="false",
+        description="Use simulation (Gazebo) clock if true",
     )
 
     # Launch rviz
@@ -55,6 +64,7 @@ def generate_launch_description():
         namespace=namespace,
         arguments=["-d", rviz_config_file],
         output="screen",
+        parameters=[{"use_sim_time": use_sim_time}],
         remappings=[
             ("/tf", "tf"),
             ("/tf_static", "tf_static"),
@@ -74,6 +84,7 @@ def generate_launch_description():
     # Declare the launch options
     ld.add_action(declare_namespace_cmd)
     ld.add_action(declare_rviz_config_file_cmd)
+    ld.add_action(declare_use_sim_time_cmd)
 
     # Add any conditioned actions
     ld.add_action(start_rviz_cmd)

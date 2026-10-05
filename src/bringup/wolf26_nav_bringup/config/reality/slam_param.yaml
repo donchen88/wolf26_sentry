@@ -703,7 +703,7 @@ local_costmap:
           # ---- 衰减与模型 ----
           decay_acceleration: 0.0
           model_type: 1
-        # plugin: "pb_nav2_costmap_2d::IntensityObstacleLayer"
+        # plugin: "nav2_plugins::IntensityObstacleLayer"
         # enabled: True
         # footprint_clearing_enabled: True
         # min_obstacle_intensity: 0.1
@@ -743,7 +743,7 @@ local_costmap:
         cost_scaling_factor: 8.0
         inflation_radius: 0.6
       escape_bias_layer:
-        plugin: "escape_bias_layer::EscapeBiasLayer"
+        plugin: "nav2_plugins::EscapeBiasLayer"
         enabled: true
         sector_count: 16
         sample_radius_min: 0.6
@@ -764,7 +764,7 @@ global_costmap:
       track_unknown_space: false
       plugins: ["static_layer", "slowdown_zone_layer", "obstacle_layer", "inflation_layer"]      
       slowdown_zone_layer:
-        plugin: "pb_nav2_costmap_2d::SlowdownZoneLayer"
+        plugin: "nav2_plugins::SlowdownZoneLayer"
         enabled: true
         map_topic: "<robot_namespace>/slowdown_map"
         state_topic: "<robot_namespace>/slowdown_zone_state"  # 减速区状态输出话题, UInt8: 1=在减速区内, 0=不在
@@ -838,7 +838,7 @@ global_costmap:
           # ---- 衰减与模型 ----
           decay_acceleration: 0.0
           model_type: 1
-        # plugin: "pb_nav2_costmap_2d::IntensityObstacleLayer"
+        # plugin: "nav2_plugins::IntensityObstacleLayer"
         # enabled: True
         # footprint_clearing_enabled: True
         # min_obstacle_intensity: 0.2
@@ -1006,7 +1006,7 @@ behavior_server:
     spin:
       plugin: "nav2_behaviors/Spin"
     backup:
-      # plugin: "pb_nav2_behaviors/BackUpFreeSpace"
+      # plugin: "nav2_plugins/BackUpFreeSpace"
       plugin: "nav2_behaviors/BackUpTwzFree"   # C++ 类名（确保 plugin.xml / export 与此一致）
       robot_radius: 0.1
       max_radius: 1.5
@@ -1028,7 +1028,7 @@ behavior_server:
     max_rotational_vel: 1.0
     min_rotational_vel: 0.3
     rotational_acc_lim: 2.0
-    # params for pb_nav2_behaviors/BackUpFreeSpace
+    # params for nav2_plugins/BackUpFreeSpace
     # service_name: "global_costmap/get_costmap"
     # max_radius: 0.6
     # visualize: false
