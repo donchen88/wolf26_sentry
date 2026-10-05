@@ -14,43 +14,43 @@ RM 2026 赛季野狼战队哨兵导航工作区：**定位 / 感知 / 导航 / �
 
 ```text
 src/
-├── localization/      状态估计与定位
-│   ├── point_lio/                     LiDAR 惯性里程计
-│   ├── small_gicp_relocalization/     基于先验点云的重定位
-│   ├── loam_interface/                LOAM 系接口适配
-│   └── sensor_scan_generation/        传感器扫描生成
-├── perception/        传感器驱动与点云处理
-│   ├── livox_ros_driver2/             Livox MID-360 驱动
-│   ├── merge_cloud/                   双雷达点云融合
-│   ├── lidar_align_tool/              雷达外参标定
-│   ├── terrain_analysis/              地形分析
-│   └── pointcloud_to_laserscan/       点云转激光扫描
-├── navigation/        Nav2 插件与控制器
-│   ├── nav2_plugins/                  自定义 costmap 层与行为插件（含减速区层）
-│   ├── behavior_ext_plugins/          扩展行为插件
-│   ├── pb_omni_pid_pursuit_controller/ 全向 PID 追踪控制器
-│   ├── spatio_temporal_voxel_layer/   STVL 三维体素层（LGPL v2.1）
-│   └── fake_vel_transform/            速度变换（底盘坐标系适配）
-├── interfaces/        消息契约
-│   ├── robot_msgs/                    底盘/裁判系统消息
-│   ├── roborts_msgs/                  RoboRTS 消息（GPL-3.0）
-│   ├── sp_msgs/                       与自瞄共享消息
-│   └── auto_aim_interfaces/           与视觉共享消息
-├── description/       机器人模型描述
-│   ├── pb2025_robot_description/      SDF(xmacro) 整机模型与静态外参（MIT）
-│   ├── sdformat_tools/                SDF → URDF 转换（launch 期调用）
-│   └── rmoss_gz_resources/            RoboMaster 模型资源（Apache-2.0）
+├── localization/
+│   ├── point_lio/
+│   ├── small_gicp_relocalization/
+│   ├── loam_interface/
+│   └── sensor_scan_generation/
+├── perception/
+│   ├── livox_ros_driver2/
+│   ├── merge_cloud/
+│   ├── lidar_align_tool/
+│   ├── terrain_analysis/
+│   └── pointcloud_to_laserscan/
+├── navigation/
+│   ├── nav2_plugins/
+│   ├── behavior_ext_plugins/
+│   ├── pb_omni_pid_pursuit_controller/
+│   ├── spatio_temporal_voxel_layer/
+│   └── fake_vel_transform/
+├── interfaces/
+│   ├── robot_msgs/
+│   ├── roborts_msgs/
+│   ├── sp_msgs/
+│   └── auto_aim_interfaces/
+├── description/
+│   ├── pb2025_robot_description/
+│   ├── sdformat_tools/
+│   └── rmoss_gz_resources/
 ├── driver/
-│   └── rm_serial_driver_nav2/         下位机串口驱动
+│   └── rm_serial_driver_nav2/
 └── bringup/
-    └── wolf26_nav_bringup/            启动文件、参数、地图与行为树
-        ├── launch/                    顶层入口与各模块 launch
-        ├── config/reality/            参数文件与雷达 user_config
-        ├── behavior_trees/            Nav2 行为树
-        ├── map/  maps/  pcd/          栅格地图 / 减速区地图 / 先验点云
-        ├── rviz/                      RViz 配置
-        ├── docs/upstream/             上游 README 存档（见 THIRD_PARTY_NOTICES）
-        └── scripts/                   周期存图脚本
+    └── wolf26_nav_bringup/
+        ├── launch/
+        ├── config/reality/
+        ├── behavior_trees/
+        ├── map/  maps/  pcd/
+        ├── rviz/
+        ├── docs/upstream/
+        └── scripts/
 ```
 
 
